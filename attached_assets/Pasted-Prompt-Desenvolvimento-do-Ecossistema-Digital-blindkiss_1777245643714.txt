@@ -1,0 +1,34 @@
+Prompt: Desenvolvimento do Ecossistema Digital "blindkiss"
+Objetivo: Criar um website institucional e interativo para a banda "blindkiss", com um design underground/minimalista e um sistema de gestão de conteúdos (Backoffice) robusto.
+Stack Técnica e Infraestrutura
+Frontend: React.js ou Next.js (para SEO e performance).
+Backend: Node.js (API) integrada com uma base de dados PostgreSQL.
+Configuração: Toda a ligação à DB deve ser feita via variáveis de ambiente (.env) e no env chamara-se DATABASE_URL.
+Backoffice/CMS: Criar uma área administrativa protegida por login onde a banda possa:
+Editar todos os textos (títulos, bios, descrições).
+Fazer upload e substituir imagens (logo, fotos de concertos, backgrounds).
+Alterar a paleta de cores principal (Hex codes) e tipografias.
+Gerir a base de dados de eventos e de membros do "BK-ID".
+Arquitetura do Site (Páginas)
+Página 01: Home (The Pulse):
+Design focado no logótipo (boca com olho). O olho deve ter um efeito de "seguimento de rato" (interatividade).
+Seção de destaque: "RECRUTAMENTO". Um layout tipo poster "Wanted" para Baixista e Baterista, com campos de texto editáveis via backoffice.
+Página 02: Archive (Eventos):
+Subdividida em "Upcoming Riots" (Futuros) e "Past Echoes" (Passados).
+Cada evento deve conter: Data, Hora, Local (com link Google Maps), Preço e link de bilheteira.
+No Backoffice: Quando um evento passa da data atual, ele deve ser movido automaticamente para "Past" ou via toggle manual.
+Página 03: BK-ID (The Community Card):
+Inspirado em Radiohead.com/library.
+Funcionalidade: O utilizador insere nome e carrega uma foto. O sistema gera um "Cartão de Sócio Digital" com um número de série único (gerado pela DB: ex: BK-2026-001).
+Design do Cartão: Estética de cartão de identificação industrial/militar, com filtros de ruído e P&B aplicados via CSS à foto do utilizador.
+Os dados dos membros devem ser guardados na DB para uso futuro (mailing list/descontos).
+Funcionalidades "Fora da Caixa" (Diferenciadores)
+Modo "Glitch": Um botão no backoffice que, ao ser ativado, aplica um filtro de distorção visual (glitch) no site inteiro para anunciar algo "perigoso" ou um lançamento novo.
+Leitor de Áudio Custom: Um player de áudio minimalista que imita um gravador de cassetes, onde a banda pode carregar trechos de covers ou ensaios (editável no backoffice).
+Dinamismo de Cores: O administrador pode mudar a "cor de destaque" (ex: do vermelho atual para um verde ácido) e o site inteiro deve atualizar instantaneamente (CSS Variables).
+Requisitos de Design (UI/UX)
+Estética: Dark Mode absoluto. Uso de texturas de papel rasgado, grão de película e tipografia monoespaçada (tipo máquina de escrever ou terminal de computador).
+Localização: Referências sutis à cidade do Porto no rodapé ou em coordenadas geográficas.
+Mobile First: O site tem de ser uma experiência impecável no telemóvel, já que o tráfego virá maioritariamente do Instagram.
+Instrução para o Código: "Por favor, estrutura o projeto com uma separação clara entre as rotas da API e os componentes de UI. Garante que o esquema do PostgreSQL inclua tabelas para events, users_bkid, site_settings e content_blocks. O código deve ser limpo, documentado e pronto para produção."
+obs: deixo aqui umas fotos do logo e de anuncios para te explicare como quero o design e ui do site, eles gostam muito dessa cor:#dddad3(principal), dessa:#910802(titulos), #7d7573(texto), quero que tenha designs giros e fora da caixa, pode ter 3d scrolls, 2 scroll

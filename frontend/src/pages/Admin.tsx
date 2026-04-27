@@ -91,9 +91,6 @@ export default function Admin() {
             >
               {login.isPending ? "A AUTENTICAR..." : "ENTRAR"}
             </button>
-            <p className="text-center font-mono text-xs text-foreground/50 mt-4">
-              [ DICA: admin / blindkiss ]
-            </p>
           </form>
         </div>
       </div>

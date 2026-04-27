@@ -1,11 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import logoUrl from "@assets/image_1777245733624.png";
+import { useGetSiteSettings } from "@/api-client";
+import logoUrl from "@assets/logo.png";
+import logoTextUrl from "@assets/logo-text.png";
 
 export function SiteHeader() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { data: settings } = useGetSiteSettings();
+  const headerLogoSrc = settings?.logoUrl || logoUrl;
 
   const links = [
     { href: "/", label: "INÍCIO" },
@@ -18,10 +22,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b-2 border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <img src={logoUrl} alt="Blindkiss Logo" className="h-8 w-auto object-contain" />
-          <span className="font-display text-xl tracking-widest text-primary inline-block">
-            BLINDKISS
-          </span>
+          <img src={headerLogoSrc} alt="Blindkiss Logo" className="h-8 w-auto object-contain" />
+          <img src={logoTextUrl} alt="Blindkiss" className="h-6 w-auto object-contain" />
         </Link>
 
         {/* Desktop Nav */}

@@ -32,6 +32,13 @@ function serialize(r: {
   show_recruitment_drummer: boolean;
   recruitment_urgent_text: string;
   show_recruitment_urgent: boolean;
+  marquee_text: string;
+  logo_url: string | null;
+  home_logo_url: string | null;
+  archive_title: string;
+  archive_subtitle: string;
+  archive_upcoming_button: string;
+  archive_past_button: string;
 }) {
   return {
     colorBackground: r.color_background,
@@ -52,6 +59,13 @@ function serialize(r: {
     showRecruitmentDrummer: r.show_recruitment_drummer,
     recruitmentUrgentText: r.recruitment_urgent_text,
     showRecruitmentUrgent: r.show_recruitment_urgent,
+    marqueeText: r.marquee_text,
+    logoUrl: r.logo_url,
+    homeLogoUrl: r.home_logo_url,
+    archiveTitle: r.archive_title,
+    archiveSubtitle: r.archive_subtitle,
+    archiveUpcomingButton: r.archive_upcoming_button,
+    archivePastButton: r.archive_past_button,
   };
 }
 
@@ -84,6 +98,13 @@ router.put("/settings", requireAdmin, async (req, res) => {
       show_recruitment_drummer: body.showRecruitmentDrummer,
       recruitment_urgent_text: body.recruitmentUrgentText,
       show_recruitment_urgent: body.showRecruitmentUrgent,
+      marquee_text: body.marqueeText,
+      logo_url: body.logoUrl,
+      home_logo_url: body.homeLogoUrl,
+      archive_title: body.archiveTitle,
+      archive_subtitle: body.archiveSubtitle,
+      archive_upcoming_button: body.archiveUpcomingButton,
+      archive_past_button: body.archivePastButton,
       updated_at: new Date(),
     },
   });

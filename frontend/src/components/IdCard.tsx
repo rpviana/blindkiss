@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
-import logoUrl from "@assets/image_1777245733624.png";
-import defaultPhoto from "@assets/image_1777245746860.png";
+import logoUrl from "@assets/logo.png";
+import defaultPhoto from "@assets/bk-id-photo.png";
 
 export interface IdCardProps {
   name: string;

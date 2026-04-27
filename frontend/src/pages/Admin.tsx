@@ -208,6 +208,23 @@ function SettingsTab() {
     setForm({ ...form, [e.target.name]: value });
   };
 
+  const handleImageUpload = (field: "logoUrl" | "homeLogoUrl") =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        setForm((currentForm: any) => ({ ...currentForm, [field]: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+      e.target.value = "";
+    };
+
+  const clearImage = (field: "logoUrl" | "homeLogoUrl") => {
+    setForm({ ...form, [field]: null });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateSettings.mutate({ data: form }, {
@@ -294,6 +311,135 @@ function SettingsTab() {
             <div>
               <label className="block font-mono text-sm mb-1">Coordenadas (Rodapé)</label>
               <input type="text" name="footerCoords" value={form.footerCoords} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 border-4 border-primary/20 p-6 bg-primary/5">
+          <h3 className="font-display text-2xl uppercase text-primary border-b-2 border-primary/20 pb-2 mb-4">Barra Móvel (Marquee)</h3>
+          
+          <div>
+            <label className="block font-mono text-sm font-bold mb-2">Texto da Barra (use // para separadores)</label>
+            <input 
+              type="text" 
+              name="marqueeText" 
+              value={form.marqueeText} 
+              onChange={handleChange} 
+              className="w-full border-2 border-border p-2 font-mono bg-background" 
+              placeholder="BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // "
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4 border-4 border-primary/20 p-6 bg-primary/5">
+          <h3 className="font-display text-2xl uppercase text-primary border-b-2 border-primary/20 pb-2 mb-4">Logo / Imagens</h3>
+          
+          <div className="space-y-3 border-2 border-dashed border-border p-4">
+            <div className="flex items-center justify-between gap-4">
+              <label className="block font-mono text-sm font-bold">Logo do Header</label>
+              {form.logoUrl ? (
+                <button type="button" onClick={() => clearImage("logoUrl")} className="font-mono text-xs uppercase text-primary hover:underline">
+                  Limpar
+                </button>
+              ) : null}
+            </div>
+            <input 
+              type="file" 
+              accept="image/*" 
+              capture="environment"
+              onChange={handleImageUpload("logoUrl")} 
+              className="block w-full text-sm font-mono"
+            />
+            <p className="font-mono text-xs text-foreground/60">Escolhe um ficheiro local do pc ou telemóvel.</p>
+            <input 
+              type="text" 
+              name="logoUrl" 
+              value={form.logoUrl || ""} 
+              onChange={handleChange} 
+              className="w-full border-2 border-border p-2 font-mono bg-background" 
+              placeholder="URL ou data:image/..."
+            />
+            {form.logoUrl ? <img src={form.logoUrl} alt="Pré-visualização header" className="max-h-24 object-contain border-2 border-border bg-background p-2" /> : null}
+          </div>
+
+          <div className="space-y-3 border-2 border-dashed border-border p-4">
+            <div className="flex items-center justify-between gap-4">
+              <label className="block font-mono text-sm font-bold">Logo da Home</label>
+              {form.homeLogoUrl ? (
+                <button type="button" onClick={() => clearImage("homeLogoUrl")} className="font-mono text-xs uppercase text-primary hover:underline">
+                  Limpar
+                </button>
+              ) : null}
+            </div>
+            <input 
+              type="file" 
+              accept="image/*" 
+              capture="environment"
+              onChange={handleImageUpload("homeLogoUrl")} 
+              className="block w-full text-sm font-mono"
+            />
+            <p className="font-mono text-xs text-foreground/60">Escolhe um ficheiro local do pc ou telemóvel.</p>
+            <input 
+              type="text" 
+              name="homeLogoUrl" 
+              value={form.homeLogoUrl || ""} 
+              onChange={handleChange} 
+              className="w-full border-2 border-border p-2 font-mono bg-background" 
+              placeholder="URL ou data:image/..."
+            />
+            {form.homeLogoUrl ? <img src={form.homeLogoUrl} alt="Pré-visualização home" className="max-h-32 object-contain border-2 border-border bg-background p-2" /> : null}
+          </div>
+        </div>
+
+        <div className="space-y-4 border-4 border-primary/20 p-6 bg-primary/5">
+          <h3 className="font-display text-2xl uppercase text-primary border-b-2 border-primary/20 pb-2 mb-4">Página de Arquivo (Gigs)</h3>
+          
+          <div>
+            <label className="block font-mono text-sm font-bold mb-2">Título da Página</label>
+            <input 
+              type="text" 
+              name="archiveTitle" 
+              value={form.archiveTitle} 
+              onChange={handleChange} 
+              className="w-full border-2 border-border p-2 font-mono bg-background" 
+              placeholder="[ ARQUIVO DE GIGS ]"
+            />
+          </div>
+
+          <div>
+            <label className="block font-mono text-sm font-bold mb-2">Subtítulo da Página</label>
+            <input 
+              type="text" 
+              name="archiveSubtitle" 
+              value={form.archiveSubtitle} 
+              onChange={handleChange} 
+              className="w-full border-2 border-border p-2 font-mono bg-background" 
+              placeholder="RUÍDO AO VIVO. TESTEMUNHO DO CAOS."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-mono text-sm font-bold mb-2">Botão: Próximos</label>
+              <input 
+                type="text" 
+                name="archiveUpcomingButton" 
+                value={form.archiveUpcomingButton} 
+                onChange={handleChange} 
+                className="w-full border-2 border-border p-2 font-mono bg-background" 
+                placeholder="PRÓXIMOS DISTÚRBIOS"
+              />
+            </div>
+            <div>
+              <label className="block font-mono text-sm font-bold mb-2">Botão: Passados</label>
+              <input 
+                type="text" 
+                name="archivePastButton" 
+                value={form.archivePastButton} 
+                onChange={handleChange} 
+                className="w-full border-2 border-border p-2 font-mono bg-background" 
+                placeholder="ECOS PASSADOS"
+              />
             </div>
           </div>
         </div>

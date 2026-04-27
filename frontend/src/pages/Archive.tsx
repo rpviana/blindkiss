@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useListEvents, getListEventsQueryKey } from "@/api-client";
+import { useListEvents, getListEventsQueryKey, useGetSiteSettings } from "@/api-client";
 import { EventCard } from "@/components/EventCard";
 import { MarqueeStrip } from "@/components/MarqueeStrip";
 import { motion } from "framer-motion";
 
 export default function Archive() {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
+  const { data: settings } = useGetSiteSettings();
 
   const { data: events = [], isLoading } = useListEvents(
     { status: tab },
@@ -16,10 +17,10 @@ export default function Archive() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="pt-24 pb-12 px-4 md:px-8 text-center border-b-8 border-border">
         <h1 className="font-display text-5xl md:text-7xl tracking-tighter uppercase mb-6 text-primary">
-          [ ARQUIVO DE GIGS ]
+          [ {settings?.archiveTitle || "ARQUIVO DE GIGS"} ]
         </h1>
         <p className="font-mono text-lg md:text-xl font-bold max-w-2xl mx-auto">
-          RUÍDO AO VIVO. TESTEMUNHO DO CAOS.
+          {settings?.archiveSubtitle || "RUÍDO AO VIVO. TESTEMUNHO DO CAOS."}
         </p>
       </div>
 
@@ -36,7 +37,7 @@ export default function Archive() {
                 : "bg-card text-foreground hover:bg-muted"
             }`}
           >
-            PRÓXIMOS DISTÚRBIOS
+            {settings?.archiveUpcomingButton || "PRÓXIMOS DISTÚRBIOS"}
           </button>
           <button
             onClick={() => setTab("past")}
@@ -46,7 +47,7 @@ export default function Archive() {
                 : "bg-card text-foreground hover:bg-muted"
             }`}
           >
-            ECOS PASSADOS
+            {settings?.archivePastButton || "ECOS PASSADOS"}
           </button>
         </div>
 

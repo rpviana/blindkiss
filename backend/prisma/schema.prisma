@@ -8,118 +8,125 @@ datasource db {
 
 model admins {
   id            Int      @id @default(autoincrement())
-  username      String   @unique(map: "admins_username_unique")
-  password_hash String
+  username      String   @unique(map: "admins_username_unique") @db.Text
+  password_hash String   @db.Text
   created_at    DateTime @default(now()) @db.Timestamptz(6)
-}
-
-model bkid_members {
-  id               Int      @id @default(autoincrement())
-  serial           String   @unique(map: "bkid_members_serial_unique")
-  supporter_number Int?     @unique(map: "bkid_members_supporter_number_unique")
-  name             String
-  email            String?
-  photo_url        String?
-  created_at       DateTime @default(now()) @db.Timestamptz(6)
-}
-
-model content_blocks {
-  id         Int      @id @default(autoincrement())
-  key        String   @unique(map: "content_blocks_key_unique")
-  title      String?
-  body       String?
-  image_url  String?
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
-}
-
-model events {
-  id          Int      @id @default(autoincrement())
-  title       String
-  venue       String
-  city        String
-  address     String
-  maps_url    String?
-  ticket_url  String?
-  price       String?
-  event_date  DateTime @db.Timestamptz(6)
-  poster_url  String?
-  description String?
-  force_past  Boolean  @default(false)
-  created_at  DateTime @default(now()) @db.Timestamptz(6)
-}
-
-model site_settings {
-  id                   Int      @id @default(autoincrement())
-  color_background     String   @default("#dddad3")
-  color_title          String   @default("#910802")
-  color_text           String   @default("#7d7573")
-  color_accent         String   @default("#910802")
-  glitch_mode          Boolean  @default(false)
-  recruitment_title    String   @default("WANTED")
-  recruitment_subtitle String   @default("blindkiss procura novos membros")
-  recruitment_bassist  String   @default("BAIXISTA — disponibilidade para ensaios semanais e concertos no Porto.")
-  recruitment_drummer  String   @default("BATERISTA — atitude crua, gosto pelo barulho, presença em palco.")
-  recruitment_contact  String   @default("contacto@blindkiss.pt")
-  hero_tagline         String   @default("RUÍDO COM BEIJOS // PORTO")
-  footer_coords        String   @default("41.1496° N, 8.6109° W")
-  footer_city          String   @default("PORTO — PT")
-  show_recruitment     Boolean  @default(true)
-  show_recruitment_bassist Boolean @default(true)
-  show_recruitment_drummer Boolean @default(true)
-  recruitment_urgent_text String @default("URGENTE")
-  show_recruitment_urgent Boolean @default(true)
-  updated_at           DateTime @default(now()) @db.Timestamptz(6)
-}
-
-model tracks {
-  id           Int      @id @default(autoincrement())
-  title        String
-  artist       String?
-  url          String
-  duration_sec Int?
-  created_at   DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model announcements {
   id         Int      @id @default(autoincrement())
-  title      String
-  content    String
-  image_url  String?
-  type       String   @default("glitch")
+  title      String   @db.Text
+  content    String   @db.Text
+  image_url  String?  @db.Text
+  type       String   @default("glitch") @db.Text
   is_active  Boolean  @default(true)
   show_popup Boolean  @default(false)
   created_at DateTime @default(now()) @db.Timestamptz(6)
 }
 
-model recruitment_applications {
-  id          Int       @id @default(autoincrement())
-  name        String
-  email       String
-  phone       String
-  instrument  String?
-  media_url   String
-  message     String?
-  status      String    @default("pending")
-  created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  reviewed_at DateTime? @db.Timestamptz(6)
+model bkid_members {
+  id               Int      @id @default(autoincrement())
+  serial           String   @unique(map: "bkid_members_serial_unique") @db.Text
+  supporter_number Int?     @unique(map: "bkid_members_supporter_number_unique")
+  name             String   @db.Text
+  email            String?  @db.Text
+  photo_url        String?  @db.Text
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
 }
 
-model vault_assets {
+model content_blocks {
+  id         Int      @id @default(autoincrement())
+  key        String   @unique(map: "content_blocks_key_unique") @db.Text
+  title      String?  @db.Text
+  body       String?  @db.Text
+  image_url  String?  @db.Text
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model events {
   id          Int      @id @default(autoincrement())
-  asset_type  String
-  title       String
-  description String?
-  file_url    String
-  preview_url String?
-  is_active   Boolean  @default(true)
-  sort_order  Int      @default(0)
+  title       String   @db.Text
+  venue       String   @db.Text
+  city        String   @db.Text
+  address     String   @db.Text
+  maps_url    String?  @db.Text
+  ticket_url  String?  @db.Text
+  price       String?  @db.Text
+  event_date  DateTime @db.Timestamptz(6)
+  poster_url  String?  @db.Text
+  description String?  @db.Text
+  force_past  Boolean  @default(false)
   created_at  DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model press_kits {
   id              Int      @id @default(autoincrement())
-  bio_short       String
-  technical_rider String
-  photo_urls      Json?
+  bio_short       String   @db.Text
+  technical_rider String   @db.Text
+  photo_urls      Json?    @db.JsonB
   updated_at      DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model recruitment_applications {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.Text
+  email       String    @db.Text
+  phone       String    @db.Text
+  instrument  String?   @db.Text
+  media_url   String    @db.Text
+  message     String?   @db.Text
+  status      String    @default("pending") @db.Text
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  reviewed_at DateTime? @db.Timestamptz(6)
+}
+
+model site_settings {
+  id                       Int      @id @default(autoincrement())
+  color_background         String   @default("#dddad3") @db.Text
+  color_title              String   @default("#910802") @db.Text
+  color_text               String   @default("#7d7573") @db.Text
+  color_accent             String   @default("#910802") @db.Text
+  glitch_mode              Boolean  @default(false)
+  recruitment_title        String   @default("WANTED") @db.Text
+  recruitment_subtitle     String   @default("blindkiss procura novos membros") @db.Text
+  recruitment_bassist      String   @default("BAIXISTA — disponibilidade para ensaios semanais e concertos no Porto.") @db.Text
+  recruitment_drummer      String   @default("BATERISTA — atitude crua, gosto pelo barulho, presença em palco.") @db.Text
+  recruitment_contact      String   @default("contacto@blindkiss.pt") @db.Text
+  hero_tagline             String   @default("RUÍDO COM BEIJOS // PORTO") @db.Text
+  footer_coords            String   @default("41.1496° N, 8.6109° W") @db.Text
+  footer_city              String   @default("PORTO — PT") @db.Text
+  show_recruitment         Boolean  @default(true)
+  show_recruitment_bassist  Boolean  @default(true)
+  show_recruitment_drummer  Boolean  @default(true)
+  recruitment_urgent_text  String   @default("URGENTE") @db.Text
+  show_recruitment_urgent  Boolean  @default(true)
+  marquee_text             String   @default("BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // ") @db.Text
+  logo_url                 String?  @db.Text
+  home_logo_url            String?  @db.Text
+  archive_title            String   @default("[ ARQUIVO DE GIGS ]") @db.Text
+  archive_subtitle         String   @default("RUÍDO AO VIVO. TESTEMUNHO DO CAOS.") @db.Text
+  archive_upcoming_button  String   @default("PRÓXIMOS DISTÚRBIOS") @db.Text
+  archive_past_button      String   @default("ECOS PASSADOS") @db.Text
+  updated_at               DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model tracks {
+  id           Int      @id @default(autoincrement())
+  title        String   @db.Text
+  artist       String?  @db.Text
+  url          String   @db.Text
+  duration_sec Int?
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model vault_assets {
+  id          Int      @id @default(autoincrement())
+  asset_type  String   @db.Text
+  title       String   @db.Text
+  description String?  @db.Text
+  file_url    String   @db.Text
+  preview_url String?  @db.Text
+  is_active   Boolean  @default(true)
+  sort_order  Int      @default(0)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
 }

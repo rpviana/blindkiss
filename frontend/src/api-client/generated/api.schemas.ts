@@ -83,6 +83,13 @@ export interface SiteSettings {
   showRecruitmentDrummer: boolean;
   recruitmentUrgentText: string;
   showRecruitmentUrgent: boolean;
+  marqueeText: string;
+  logoUrl?: string | null;
+  homeLogoUrl?: string | null;
+  archiveTitle: string;
+  archiveSubtitle: string;
+  archiveUpcomingButton: string;
+  archivePastButton: string;
 }
 
 export interface ContentBlock {

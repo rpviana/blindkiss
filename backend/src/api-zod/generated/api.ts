@@ -186,6 +186,13 @@ export const GetSiteSettingsResponse = zod.object({
   showRecruitmentDrummer: zod.boolean(),
   recruitmentUrgentText: zod.string(),
   showRecruitmentUrgent: zod.boolean(),
+  marqueeText: zod.string(),
+  logoUrl: zod.string().nullish(),
+  homeLogoUrl: zod.string().nullish(),
+  archiveTitle: zod.string(),
+  archiveSubtitle: zod.string(),
+  archiveUpcomingButton: zod.string(),
+  archivePastButton: zod.string(),
 });
 
 /**
@@ -210,6 +217,13 @@ export const UpdateSiteSettingsBody = zod.object({
   showRecruitmentDrummer: zod.boolean(),
   recruitmentUrgentText: zod.string(),
   showRecruitmentUrgent: zod.boolean(),
+  marqueeText: zod.string().optional(),
+  logoUrl: zod.string().nullish().optional(),
+  homeLogoUrl: zod.string().nullish().optional(),
+  archiveTitle: zod.string().optional(),
+  archiveSubtitle: zod.string().optional(),
+  archiveUpcomingButton: zod.string().optional(),
+  archivePastButton: zod.string().optional(),
 });
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -226,6 +240,18 @@ export const UpdateSiteSettingsResponse = zod.object({
   heroTagline: zod.string(),
   footerCoords: zod.string(),
   footerCity: zod.string(),
+  showRecruitment: zod.boolean(),
+  showRecruitmentBassist: zod.boolean(),
+  showRecruitmentDrummer: zod.boolean(),
+  recruitmentUrgentText: zod.string(),
+  showRecruitmentUrgent: zod.boolean(),
+  marqueeText: zod.string(),
+  logoUrl: zod.string().nullish(),
+  homeLogoUrl: zod.string().nullish(),
+  archiveTitle: zod.string(),
+  archiveSubtitle: zod.string(),
+  archiveUpcomingButton: zod.string(),
+  archivePastButton: zod.string(),
 });
 
 /**

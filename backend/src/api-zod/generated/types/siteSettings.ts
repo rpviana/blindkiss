@@ -20,4 +20,11 @@ export interface SiteSettings {
   heroTagline: string;
   footerCoords: string;
   footerCity: string;
+  marqueeText: string;
+  logoUrl?: string;
+  homeLogoUrl?: string;
+  archiveTitle: string;
+  archiveSubtitle: string;
+  archiveUpcomingButton: string;
+  archivePastButton: string;
 }

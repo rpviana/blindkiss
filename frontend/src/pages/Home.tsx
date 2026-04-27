@@ -25,7 +25,7 @@ export default function Home() {
           style={{ scale: logoScale, y: logoY }}
           className="z-10 mb-12"
         >
-          <EyeLogo />
+          <EyeLogo src={settings?.homeLogoUrl} />
         </motion.div>
         
         <motion.div

@@ -179,6 +179,11 @@ export const GetSiteSettingsResponse = zod.object({
   heroTagline: zod.string(),
   footerCoords: zod.string(),
   footerCity: zod.string(),
+  showRecruitment: zod.boolean(),
+  showRecruitmentBassist: zod.boolean(),
+  showRecruitmentDrummer: zod.boolean(),
+  recruitmentUrgentText: zod.string(),
+  showRecruitmentUrgent: zod.boolean(),
 });
 
 /**
@@ -198,6 +203,11 @@ export const UpdateSiteSettingsBody = zod.object({
   heroTagline: zod.string(),
   footerCoords: zod.string(),
   footerCity: zod.string(),
+  showRecruitment: zod.boolean(),
+  showRecruitmentBassist: zod.boolean(),
+  showRecruitmentDrummer: zod.boolean(),
+  recruitmentUrgentText: zod.string(),
+  showRecruitmentUrgent: zod.boolean(),
 });
 
 export const UpdateSiteSettingsResponse = zod.object({

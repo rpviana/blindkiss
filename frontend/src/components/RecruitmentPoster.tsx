@@ -3,10 +3,10 @@ import { useGetSiteSettings } from "@/api-client";
 export function RecruitmentPoster() {
   const { data: settings } = useGetSiteSettings();
 
-  if (!settings) return null;
+  if (!settings || !settings.showRecruitment) return null;
 
   return (
-    <div className="max-w-2xl mx-auto bg-[#eaddce] border-[12px] border-[#222] p-8 md:p-12 relative shadow-2xl overflow-hidden before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] before:opacity-50 before:pointer-events-none">
+    <div className="max-w-2xl mx-auto bg-[#eaddce] border-[12px] border-[#222] p-8 md:p-12 pb-24 md:pb-12 relative shadow-2xl overflow-hidden before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] before:opacity-50 before:pointer-events-none">
       
       {/* Grunge Texture Overlay (Simplified) */}
       <div className="absolute inset-0 opacity-[0.05] bg-black/10 mix-blend-multiply pointer-events-none"></div>
@@ -25,21 +25,25 @@ export function RecruitmentPoster() {
 
         {/* Roles */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-12">
-          <div className="border-4 border-[#111] p-6 bg-white/50 backdrop-blur-sm relative rotate-[-2deg]">
-            <div className="absolute -top-3 -left-3 w-6 h-6 bg-[#910802] rounded-full border-2 border-[#111]"></div>
-            <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">BAIXISTA</h4>
-            <p className="font-mono text-sm text-[#333] font-bold">
-              {settings.recruitmentBassist || "GRAVE / DISTORÇÃO / ATITUDE"}
-            </p>
-          </div>
+          {settings.showRecruitmentBassist && (
+            <div className="border-4 border-[#111] p-6 bg-white/50 backdrop-blur-sm relative rotate-[-2deg]">
+              <div className="absolute -top-3 -left-3 w-6 h-6 bg-[#910802] rounded-full border-2 border-[#111]"></div>
+              <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">BAIXISTA</h4>
+              <p className="font-mono text-sm text-[#333] font-bold">
+                {settings.recruitmentBassist || "GRAVE / DISTORÇÃO / ATITUDE"}
+              </p>
+            </div>
+          )}
 
-          <div className="border-4 border-[#111] p-6 bg-white/50 backdrop-blur-sm relative rotate-[1deg]">
-            <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#910802] rounded-full border-2 border-[#111]"></div>
-            <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">BATERISTA</h4>
-            <p className="font-mono text-sm text-[#333] font-bold">
-              {settings.recruitmentDrummer || "PANCADA / RITMO / CAOS"}
-            </p>
-          </div>
+          {settings.showRecruitmentDrummer && (
+            <div className="border-4 border-[#111] p-6 bg-white/50 backdrop-blur-sm relative rotate-[1deg]">
+              <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#910802] rounded-full border-2 border-[#111]"></div>
+              <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">BATERISTA</h4>
+              <p className="font-mono text-sm text-[#333] font-bold">
+                {settings.recruitmentDrummer || "PANCADA / RITMO / CAOS"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Contact */}
@@ -53,11 +57,13 @@ export function RecruitmentPoster() {
         </div>
 
         {/* Stamp */}
-        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 opacity-80 rotate-[-15deg] pointer-events-none">
-          <div className="border-4 border-[#910802] text-[#910802] px-4 py-2 font-display text-2xl tracking-widest mix-blend-multiply">
-            URGENTE
+        {settings.showRecruitmentUrgent && (
+          <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 opacity-80 rotate-[-15deg] pointer-events-none">
+            <div className="border-4 border-[#910802] text-[#910802] px-4 py-2 font-display text-2xl tracking-widest mix-blend-multiply">
+              {settings.recruitmentUrgentText || "URGENTE"}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

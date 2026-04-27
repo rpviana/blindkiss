@@ -77,6 +77,11 @@ export interface SiteSettings {
   heroTagline: string;
   footerCoords: string;
   footerCity: string;
+  showRecruitment: boolean;
+  showRecruitmentBassist: boolean;
+  showRecruitmentDrummer: boolean;
+  recruitmentUrgentText: string;
+  showRecruitmentUrgent: boolean;
 }
 
 export interface ContentBlock {

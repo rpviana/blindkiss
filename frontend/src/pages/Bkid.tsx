@@ -154,10 +154,10 @@ export default function Bkid() {
                 </div>
               </div>
               
-              <div className="border-4 border-border p-4 md:p-6 bg-muted/30 overflow-hidden">
-                <h3 className="font-display text-xl mb-4">PRÉ-VISUALIZAÇÃO</h3>
-                <div className="flex justify-center md:justify-start">
-                  <div className="scale-[0.6] sm:scale-[0.8] md:scale-75 origin-top-left">
+              <div className="border-4 border-border p-4 md:p-6 bg-muted/30 overflow-hidden flex justify-center">
+                <div className="flex flex-col items-center">
+                  <h3 className="font-display text-xl mb-4 w-full text-center md:text-left">PRÉ-VISUALIZAÇÃO</h3>
+                  <div className="scale-[0.5] sm:scale-[0.7] md:scale-75 lg:scale-90 origin-center py-24 sm:py-32 md:py-0 md:static">
                     <IdCard name={name || "SUBJECT_NAME"} serial="BK-XXXXX" photoUrl={photoUrl} />
                   </div>
                 </div>

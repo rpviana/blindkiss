@@ -36,7 +36,7 @@ export function EyeLogo() {
   return (
     <div 
       ref={containerRef} 
-      className="relative inline-block overflow-hidden w-40 h-40 md:w-[200px] md:h-[200px]"
+      className="relative inline-block overflow-hidden w-40 h-40 md:w-[200px] md:h-[200px] animate-soft-pulse md:animate-none"
     >
       <img 
         src={logoUrl} 
@@ -44,9 +44,9 @@ export function EyeLogo() {
         className="w-full h-full object-contain pointer-events-none drop-shadow-2xl"
       />
       
-      {/* The moving pupil */}
+      {/* The moving pupil - hidden on mobile */}
       <div 
-        className="absolute rounded-full bg-black shadow-[0_0_10px_rgba(0,0,0,0.8)] w-5 h-5 md:w-6 md:h-6"
+        className="hidden md:block absolute rounded-full bg-black shadow-[0_0_10px_rgba(0,0,0,0.8)] w-5 h-5 md:w-6 md:h-6"
         style={{
           top: "43%", // Approximate position of the eye center in the image
           left: "50%",

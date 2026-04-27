@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 export function MarqueeStrip() {
-  const text = "BLIND KISS // PORTO // RUÍDO COM BEIJOS // ";
+  const text = "BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // ";
   // Duplicate enough times to ensure smooth scrolling
   const repeatedText = Array(10).fill(text).join("");
 

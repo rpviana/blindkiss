@@ -263,6 +263,37 @@ function SettingsTab() {
           </div>
         </div>
 
+        <div className="space-y-4 border-4 border-primary/20 p-6 bg-primary/5">
+          <h3 className="font-display text-2xl uppercase text-primary border-b-2 border-primary/20 pb-2 mb-4">Poster de Recrutamento (Wanted)</h3>
+          
+          <div className="flex flex-wrap gap-6">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="showRecruitment" checked={form.showRecruitment} onChange={handleChange} className="w-6 h-6 accent-primary" />
+              <span className="font-mono font-bold">Mostrar Poster na Home</span>
+            </label>
+            
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="showRecruitmentBassist" checked={form.showRecruitmentBassist} onChange={handleChange} className="w-6 h-6 accent-primary" />
+              <span className="font-mono font-bold">Mostrar Baixista</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="showRecruitmentDrummer" checked={form.showRecruitmentDrummer} onChange={handleChange} className="w-6 h-6 accent-primary" />
+              <span className="font-mono font-bold">Mostrar Baterista</span>
+            </label>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="showRecruitmentUrgent" checked={form.showRecruitmentUrgent} onChange={handleChange} className="w-6 h-6 accent-primary" />
+              <span className="font-mono font-bold">Mostrar Selo Urgente</span>
+            </label>
+          </div>
+
+          <div className="pt-4">
+            <label className="block font-mono text-sm mb-1">Texto do Selo (ex: URGENTE)</label>
+            <input type="text" name="recruitmentUrgentText" value={form.recruitmentUrgentText} onChange={handleChange} className="w-full md:w-1/3 border-2 border-border p-2 font-mono bg-background" />
+          </div>
+        </div>
+
         <button type="submit" disabled={updateSettings.isPending} className="py-3 px-8 bg-primary text-primary-foreground font-display text-xl uppercase hover:bg-foreground transition-colors border-2 border-primary">
           {updateSettings.isPending ? "A GUARDAR..." : "GUARDAR DEFINIÇÕES"}
         </button>

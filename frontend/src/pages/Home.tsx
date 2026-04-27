@@ -35,7 +35,7 @@ export default function Home() {
           className="z-10 text-center max-w-4xl"
         >
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-tighter uppercase mb-6 drop-shadow-md">
-            {settings?.heroTagline || "RUÍDO COM BEIJOS"}
+            {settings?.heroTagline || "blindkiss"}
           </h1>
         </motion.div>
 

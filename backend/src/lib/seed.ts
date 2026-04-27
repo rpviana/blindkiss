@@ -159,6 +159,59 @@ export async function ensureSeedData(): Promise<void> {
         },
       });
     }
+
+    const teamCount = await prisma.team_members.count();
+    if (teamCount === 0) {
+      await prisma.team_members.createMany({
+        data: [
+          {
+            name: "Rodrigo Viana",
+            role: "Programador",
+            codename: "The Architect",
+            age: 17,
+            bio: "Estrutura o sistema, limpa o ruído e transforma caos em código.",
+            photo_url: null,
+            sort_order: 1,
+          },
+          {
+            name: "João Moreira",
+            role: "Lead Singer",
+            codename: "The Vessel",
+            age: 19,
+            bio: "A voz central da Blindkiss, onde a tensão ganha forma.",
+            photo_url: null,
+            sort_order: 2,
+          },
+          {
+            name: "Ricardo Pais",
+            role: "Lead Guitarist",
+            codename: "The Signal",
+            age: 17,
+            bio: "Gera linhas cortantes e devolve energia em ondas afiadas.",
+            photo_url: null,
+            sort_order: 3,
+          },
+          {
+            name: "Telmo Salgado",
+            role: "Marketing",
+            codename: "The Broadcast",
+            age: 17,
+            bio: "Traduz o ruído da banda em presença, alcance e impacto.",
+            photo_url: null,
+            sort_order: 4,
+          },
+          {
+            name: "Bruna Silva",
+            role: "Marketing",
+            codename: "The Pulse",
+            age: 17,
+            bio: "Mantém a frequência certa entre a banda e o resto do mundo.",
+            photo_url: null,
+            sort_order: 5,
+          },
+        ],
+      });
+    }
   } catch (err) {
     logger.error({ err }, "Failed to seed data");
   }

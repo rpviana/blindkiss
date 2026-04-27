@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { 
   useAdminMe, 
@@ -13,6 +13,10 @@ import {
   useDeleteEvent,
   getListEventsQueryKey,
   useListBkidMembers,
+  useListTeamMembers,
+  useCreateTeamMember,
+  useUpdateTeamMember,
+  useDeleteTeamMember,
   useListContentBlocks,
   useUpdateContentBlock,
   getListContentBlocksQueryKey,
@@ -42,6 +46,15 @@ import {
   useUpdatePressKit
 } from "@/api-client";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 import { LogOut, Plus, Trash2, Edit2, Check, X, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -50,6 +63,7 @@ type AdminTab =
   | "settings"
   | "events"
   | "bkid"
+  | "team"
   | "content"
   | "tracks"
   | "announcements"
@@ -70,6 +84,7 @@ export default function Admin() {
     { id: "settings", label: "definições" },
     { id: "events", label: "eventos" },
     { id: "bkid", label: "bk-id" },
+    { id: "team", label: "equipa" },
     { id: "content", label: "conteúdo" },
     { id: "tracks", label: "faixas" },
     { id: "announcements", label: "anúncios" },
@@ -174,6 +189,7 @@ export default function Admin() {
             {activeTab === "settings" && <SettingsTab />}
             {activeTab === "events" && <EventsTab />}
             {activeTab === "bkid" && <BkidTab />}
+            {activeTab === "team" && <TeamTab />}
             {activeTab === "content" && <ContentTab />}
               {activeTab === "tracks" && <TracksTab />}
               {activeTab === "announcements" && <AnnouncementsTab />}
@@ -1497,6 +1513,526 @@ function PressKitTab() {
           GUARDAR PRESS KIT
         </button>
       </div>
+    </div>
+  );
+}
+
+function TeamTab() {
+  const { data: members = [] } = useListTeamMembers();
+  const createMember = useCreateTeamMember();
+  const updateMember = useUpdateTeamMember();
+  const deleteMember = useDeleteTeamMember();
+
+  const emptyForm = {
+    name: "",
+    role: "",
+    codename: "",
+    age: 17,
+    bio: "",
+    photoUrl: "",
+    sortOrder: 0,
+  };
+
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState(emptyForm);
+  const [sourceMode, setSourceMode] = useState<"url" | "file">("url");
+  const [selectedFileName, setSelectedFileName] = useState("");
+  const [cropOpen, setCropOpen] = useState(false);
+  const [cropSource, setCropSource] = useState("");
+  const [cropFileName, setCropFileName] = useState("");
+  const [cropScale, setCropScale] = useState(1);
+  const [cropPan, setCropPan] = useState({ x: 0, y: 0 });
+  const [isDraggingCrop, setIsDraggingCrop] = useState(false);
+  const cropFrameRef = useRef<HTMLDivElement>(null);
+  const cropImageRef = useRef<HTMLImageElement>(null);
+  const cropDragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+
+  const resetForm = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setSourceMode("url");
+    setSelectedFileName("");
+  };
+
+  const clampCropPan = (nextPan: { x: number; y: number }) => {
+    const frame = cropFrameRef.current;
+    const image = cropImageRef.current;
+
+    if (!frame || !image || !image.naturalWidth || !image.naturalHeight) {
+      return nextPan;
+    }
+
+    const frameRect = frame.getBoundingClientRect();
+    const coverScale = Math.max(frameRect.width / image.naturalWidth, frameRect.height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * coverScale * cropScale;
+    const drawHeight = image.naturalHeight * coverScale * cropScale;
+    const maxPanX = Math.max(0, (drawWidth - frameRect.width) / 2);
+    const maxPanY = Math.max(0, (drawHeight - frameRect.height) / 2);
+
+    return {
+      x: Math.max(-maxPanX, Math.min(maxPanX, nextPan.x)),
+      y: Math.max(-maxPanY, Math.min(maxPanY, nextPan.y)),
+    };
+  };
+
+  const openCropper = (dataUrl: string, fileName: string) => {
+    setCropSource(dataUrl);
+    setCropFileName(fileName);
+    setCropScale(1);
+    setCropPan({ x: 0, y: 0 });
+    setCropOpen(true);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSelectedFileName(file.name);
+      setSourceMode("file");
+      openCropper(String(reader.result || ""), file.name);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const exportCroppedImage = async () => {
+    const frame = cropFrameRef.current;
+    const image = cropImageRef.current;
+
+    if (!frame || !image || !cropSource) {
+      return;
+    }
+
+    const frameRect = frame.getBoundingClientRect();
+    const canvas = document.createElement("canvas");
+    canvas.width = 1000;
+    canvas.height = 1250;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      toast.error("Não foi possível preparar o corte da imagem.");
+      return;
+    }
+
+    const coverScale = Math.max(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * coverScale * cropScale;
+    const drawHeight = image.naturalHeight * coverScale * cropScale;
+    const scaleRatio = canvas.width / frameRect.width;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.filter = "grayscale(1) contrast(1.15) brightness(0.95)";
+    context.drawImage(
+      image,
+      (canvas.width - drawWidth) / 2 + cropPan.x * scaleRatio,
+      (canvas.height - drawHeight) / 2 + cropPan.y * scaleRatio,
+      drawWidth,
+      drawHeight,
+    );
+
+    return canvas.toDataURL("image/png", 0.95);
+  };
+
+  const confirmCrop = async () => {
+    const cropped = await exportCroppedImage();
+    if (!cropped) return;
+    setForm((current) => ({ ...current, photoUrl: cropped }));
+    setCropOpen(false);
+  };
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDraggingCrop(true);
+    cropDragStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      panX: cropPan.x,
+      panY: cropPan.y,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingCrop) return;
+    const deltaX = event.clientX - cropDragStartRef.current.x;
+    const deltaY = event.clientY - cropDragStartRef.current.y;
+    const nextPan = clampCropPan({
+      x: cropDragStartRef.current.panX + deltaX,
+      y: cropDragStartRef.current.panY + deltaY,
+    });
+    setCropPan(nextPan);
+  };
+
+  const handleCropPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingCrop) return;
+    setIsDraggingCrop(false);
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    } catch {
+      // noop
+    }
+  };
+
+  const startEdit = (member: (typeof members)[number]) => {
+    setEditingId(member.id);
+    setForm({
+      name: member.name,
+      role: member.role,
+      codename: member.codename,
+      age: member.age,
+      bio: member.bio || "",
+      photoUrl: member.photoUrl || "",
+      sortOrder: member.sortOrder,
+    });
+    setSourceMode(member.photoUrl ? "url" : "file");
+    setSelectedFileName("");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      ...form,
+      bio: form.bio.trim() || null,
+      photoUrl: form.photoUrl.trim() || null,
+    };
+
+    if (editingId) {
+      updateMember.mutate(
+        { id: editingId, data: payload },
+        {
+          onSuccess: () => {
+            toast.success("Membro atualizado.");
+            resetForm();
+          },
+          onError: () => toast.error("Erro ao atualizar membro."),
+        },
+      );
+      return;
+    }
+
+    createMember.mutate(
+      { data: payload },
+      {
+        onSuccess: () => {
+          toast.success("Membro criado.");
+          resetForm();
+        },
+        onError: () => toast.error("Erro ao criar membro."),
+      },
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+          <h2 className="font-display text-3xl uppercase">Equipa Blindkiss</h2>
+          <p className="font-mono text-sm text-foreground/70">Adicionar, editar e remover membros da página pública.</p>
+        </div>
+        <button
+          type="button"
+          onClick={resetForm}
+          className="border-2 border-border px-4 py-2 font-display uppercase tracking-widest hover:bg-muted"
+        >
+          NOVO MEMBRO
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="border-4 border-border bg-card p-4 md:p-6 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block font-mono text-xs uppercase mb-1">Nome</label>
+            <input
+              required
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="w-full border-2 border-border bg-background p-2 font-mono"
+              placeholder="Rodrigo Viana"
+            />
+          </div>
+          <div>
+            <label className="block font-mono text-xs uppercase mb-1">Idade</label>
+            <input
+              required
+              type="number"
+              min={1}
+              max={120}
+              value={form.age}
+              onChange={(e) => setForm({ ...form, age: Number(e.target.value) })}
+              className="w-full border-2 border-border bg-background p-2 font-mono"
+            />
+          </div>
+          <div>
+            <label className="block font-mono text-xs uppercase mb-1">Função</label>
+            <input
+              required
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className="w-full border-2 border-border bg-background p-2 font-mono"
+              placeholder="Programador"
+            />
+          </div>
+          <div>
+            <label className="block font-mono text-xs uppercase mb-1">Codename</label>
+            <input
+              required
+              value={form.codename}
+              onChange={(e) => setForm({ ...form, codename: e.target.value })}
+              className="w-full border-2 border-border bg-background p-2 font-mono"
+              placeholder="The Architect"
+            />
+          </div>
+          <div>
+            <label className="block font-mono text-xs uppercase mb-1">Ordem</label>
+            <input
+              type="number"
+              value={form.sortOrder}
+              onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
+              className="w-full border-2 border-border bg-background p-2 font-mono"
+              placeholder="1"
+            />
+          </div>
+          <div>
+            <label className="block font-mono text-xs uppercase mb-1">Foto</label>
+            <div className="flex gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSourceMode("url");
+                  setSelectedFileName("");
+                }}
+                className={`px-3 py-1 border-2 font-mono text-xs ${sourceMode === "url" ? "border-primary bg-primary/10" : "border-border"}`}
+              >
+                URL
+              </button>
+              <button
+                type="button"
+                onClick={() => setSourceMode("file")}
+                className={`px-3 py-1 border-2 font-mono text-xs ${sourceMode === "file" ? "border-primary bg-primary/10" : "border-border"}`}
+              >
+                FICHEIRO
+              </button>
+            </div>
+            {sourceMode === "url" ? (
+              <input
+                value={form.photoUrl}
+                onChange={(e) => setForm({ ...form, photoUrl: e.target.value })}
+                className="w-full border-2 border-border bg-background p-2 font-mono"
+                placeholder="https://... ou data:image/..."
+              />
+            ) : (
+              <div className="space-y-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhotoUpload}
+                  className="w-full border-2 border-border bg-background p-2 font-mono text-xs"
+                />
+                <p className="font-mono text-[10px] text-foreground/60">
+                  {selectedFileName ? `Selecionado: ${selectedFileName}` : "Escolhe uma foto local para abrir o recorte."}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="block font-mono text-xs uppercase mb-1">Bio curta</label>
+          <textarea
+            value={form.bio}
+            onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            className="w-full border-2 border-border bg-background p-2 font-mono h-24"
+            placeholder="Descrição criativa do membro"
+          />
+        </div>
+
+        {form.photoUrl && (
+          <div className="border-2 border-dashed border-border p-3 bg-background/40 max-w-xs">
+            <img src={form.photoUrl} alt="Pré-visualização membro" className="w-full h-48 object-cover" />
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            disabled={createMember.isPending || updateMember.isPending}
+            className="bg-primary text-primary-foreground px-6 py-3 font-display uppercase tracking-widest hover:bg-foreground disabled:opacity-50"
+          >
+            {editingId ? "ATUALIZAR" : "CRIAR"}
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="border-2 border-border px-6 py-3 font-display uppercase tracking-widest hover:bg-muted"
+            >
+              CANCELAR
+            </button>
+          )}
+        </div>
+      </form>
+
+      <Dialog open={cropOpen} onOpenChange={(open) => setCropOpen(open)}>
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-3xl uppercase">Recortar fotografia</DialogTitle>
+            <DialogDescription className="font-mono text-xs uppercase tracking-[0.2em]">
+              Arrasta a imagem, usa o zoom e escolhe a área que vai aparecer na equipa.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-2 border-border bg-muted/20 p-3 font-mono text-xs uppercase text-foreground/70">
+              <span>{cropFileName || "Imagem selecionada"}</span>
+              <span>grade ativa 4:5</span>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
+              <div
+                ref={cropFrameRef}
+                className="relative aspect-[4/5] w-full overflow-hidden border-4 border-border bg-zinc-950 select-none touch-none"
+                onPointerDown={handleCropPointerDown}
+                onPointerMove={handleCropPointerMove}
+                onPointerUp={handleCropPointerUp}
+                onPointerLeave={handleCropPointerUp}
+              >
+                {cropSource && (
+                  <img
+                    ref={cropImageRef}
+                    src={cropSource}
+                    alt="Recorte da equipa"
+                    onLoad={() => {
+                      setCropPan((current) => clampCropPan(current));
+                    }}
+                    className="absolute left-1/2 top-1/2 h-full w-full max-w-none cursor-move object-cover"
+                    style={{
+                      transform: `translate(-50%, -50%) translate(${cropPan.x}px, ${cropPan.y}px) scale(${cropScale})`,
+                      transformOrigin: "center center",
+                      filter: "grayscale(1) contrast(1.35) brightness(0.92)",
+                    }}
+                    draggable={false}
+                  />
+                )}
+
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent_0,transparent_calc(33.333%-1px),rgba(255,255,255,0.18)_calc(33.333%-1px),rgba(255,255,255,0.18)_33.333%,transparent_33.333%,transparent_calc(66.666%-1px),rgba(255,255,255,0.18)_calc(66.666%-1px),rgba(255,255,255,0.18)_66.666%,transparent_66.666%,transparent_calc(100%-1px)),linear-gradient(180deg,transparent_0,transparent_calc(33.333%-1px),rgba(255,255,255,0.18)_calc(33.333%-1px),rgba(255,255,255,0.18)_33.333%,transparent_33.333%,transparent_calc(66.666%-1px),rgba(255,255,255,0.18)_calc(66.666%-1px),rgba(255,255,255,0.18)_66.666%,transparent_66.666%,transparent_calc(100%-1px))]" />
+                <div className="pointer-events-none absolute inset-0 border border-white/10" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_55%,rgba(0,0,0,0.18)_100%)]" />
+                <div className="pointer-events-none absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 border-2 border-white/70" />
+              </div>
+
+              <div className="space-y-4 border-2 border-border bg-card p-4">
+                <div>
+                  <label className="block font-mono text-xs uppercase mb-2">Zoom</label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="2.4"
+                    step="0.01"
+                    value={cropScale}
+                    onChange={(e) => {
+                      const nextScale = Number(e.target.value);
+                      setCropScale(nextScale);
+                      setCropPan((current) => clampCropPan(current));
+                    }}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="space-y-2 font-mono text-xs text-foreground/70 leading-relaxed">
+                  <p>• Arrasta para reposicionar a foto.</p>
+                  <p>• O recorte fica guardado na base de dados.</p>
+                  <p>• A vista pública usa a imagem já cortada.</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCropScale(1);
+                    setCropPan({ x: 0, y: 0 });
+                  }}
+                  className="w-full border-2 border-border px-4 py-2 font-display uppercase tracking-widest hover:bg-muted"
+                >
+                  CENTRAR
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-3 sm:gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setCropOpen(false);
+                setCropSource("");
+              }}
+              className="border-2 border-border px-6 py-3 font-display uppercase tracking-widest hover:bg-muted"
+            >
+              CANCELAR
+            </button>
+            <button
+              type="button"
+              onClick={confirmCrop}
+              className="bg-primary text-primary-foreground px-6 py-3 font-display uppercase tracking-widest hover:bg-foreground"
+            >
+              USAR RECORTE
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {members.map((member) => (
+          <article key={member.id} className="border-4 border-border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-mono text-[10px] uppercase text-primary tracking-[0.3em]">{member.codename}</p>
+                <h3 className="font-display text-2xl uppercase">{member.name}</h3>
+              </div>
+              <div className="font-mono text-xs border-2 border-border px-2 py-1">#{member.sortOrder}</div>
+            </div>
+            <p className="font-mono text-sm uppercase text-foreground/70">{member.role} / {member.age} anos</p>
+            {member.photoUrl ? (
+              <img src={member.photoUrl} alt={member.name} className="w-full h-56 object-cover border-2 border-border" />
+            ) : (
+              <div className="w-full h-56 border-2 border-dashed border-border flex items-center justify-center font-mono text-xs text-foreground/50 uppercase">
+                Sem fotografia
+              </div>
+            )}
+            <p className="font-mono text-xs leading-relaxed text-foreground/75">{member.bio || "Sem bio configurada."}</p>
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => startEdit(member)}
+                className="flex-1 border-2 border-border px-3 py-2 font-mono text-xs uppercase hover:bg-muted"
+              >
+                EDITAR
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm(`Eliminar ${member.name}?`)) {
+                    deleteMember.mutate(member.id, {
+                      onSuccess: () => toast.success("Membro eliminado."),
+                      onError: () => toast.error("Erro ao eliminar membro."),
+                    });
+                  }
+                }}
+                className="flex-1 border-2 border-red-600 px-3 py-2 font-mono text-xs uppercase text-red-700 hover:bg-red-100"
+              >
+                REMOVER
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {members.length === 0 && (
+        <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">
+          NENHUM MEMBRO REGISTADO
+        </div>
+      )}
     </div>
   );
 }

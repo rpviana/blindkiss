@@ -13,6 +13,7 @@ export function SiteHeader() {
 
   const links = [
     { href: "/", label: "INÍCIO" },
+    { href: "/team", label: "EQUIPA" },
     { href: "/archive", label: "ARQUIVO" },
     { href: "/bk-id", label: "BK-ID" },
     { href: "/admin", label: "ADMIN" },

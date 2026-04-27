@@ -18,6 +18,28 @@ export interface AnnouncementInput {
   isActive?: boolean;
 }
 
+export interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  codename: string;
+  age: number;
+  bio?: string | null;
+  photoUrl?: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface TeamMemberInput {
+  name: string;
+  role: string;
+  codename: string;
+  age: number;
+  bio?: string | null;
+  photoUrl?: string | null;
+  sortOrder?: number;
+}
+
 // Announcements Hooks
 export const useListAnnouncements = () => {
   return useQuery<Announcement[]>({
@@ -73,6 +95,64 @@ export const useDeleteAnnouncement = () => {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/announcements"] });
       qc.invalidateQueries({ queryKey: ["/api/admin/announcements"] });
+    },
+  });
+};
+
+// Team Hooks
+export const useListTeamMembers = () => {
+  return useQuery<TeamMember[]>({
+    queryKey: ["/api/team"],
+    queryFn: () => customFetch<TeamMember[]>("/api/team", { method: "GET" }),
+  });
+};
+
+export const useAdminListTeamMembers = () => {
+  return useQuery<TeamMember[]>({
+    queryKey: ["/api/admin/team-members"],
+    queryFn: () => customFetch<TeamMember[]>("/api/admin/team-members", { method: "GET" }),
+  });
+};
+
+export const useCreateTeamMember = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: TeamMemberInput) =>
+      customFetch<TeamMember>("/api/admin/team-members", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/team"] });
+      qc.invalidateQueries({ queryKey: ["/api/admin/team-members"] });
+    },
+  });
+};
+
+export const useUpdateTeamMember = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<TeamMemberInput> }) =>
+      customFetch<TeamMember>(`/api/admin/team-members/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/team"] });
+      qc.invalidateQueries({ queryKey: ["/api/admin/team-members"] });
+    },
+  });
+};
+
+export const useDeleteTeamMember = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => customFetch(`/api/admin/team-members/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/team"] });
+      qc.invalidateQueries({ queryKey: ["/api/admin/team-members"] });
     },
   });
 };

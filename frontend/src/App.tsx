@@ -11,6 +11,7 @@ import { AnnouncementOverlay } from "@/components/AnnouncementOverlay";
 import Home from "@/pages/Home";
 
 import Archive from "@/pages/Archive";
+import Team from "@/pages/Team";
 import Bkid from "@/pages/Bkid";
 import Admin from "@/pages/Admin";
 import Vault from "@/pages/Vault";
@@ -33,6 +34,7 @@ function Router() {
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/team" component={Team} />
           <Route path="/archive" component={Archive} />
           <Route path="/bk-id" component={Bkid} />
           <Route path="/vault" component={Vault} />

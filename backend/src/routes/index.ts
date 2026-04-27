@@ -10,6 +10,7 @@ import announcementsRouter from "./announcements";
 import recruitmentRouter from "./recruitment";
 import vaultRouter from "./vault";
 import pressRouter from "./press";
+import teamRouter from "./team";
 
 
 const router: IRouter = Router();
@@ -25,6 +26,7 @@ router.use(announcementsRouter);
 router.use(recruitmentRouter);
 router.use(vaultRouter);
 router.use(pressRouter);
+router.use(teamRouter);
 
 
 export default router;

@@ -1,3 +1,4 @@
+/* Tailwind CSS v4 directives - ignore IDE linter warnings for @theme, @plugin, etc. */
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";

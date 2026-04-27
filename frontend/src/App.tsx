@@ -53,12 +53,10 @@ function App() {
           <Toaster 
             position="top-right"
             toastOptions={{
-              className: "font-mono border-4 border-border rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-              success: {
-                className: "bg-green-100 text-green-800",
-              },
-              error: {
-                className: "bg-red-100 text-red-800",
+              classNames: {
+                toast: "font-mono border-4 border-border rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
+                success: "bg-green-100 text-green-800 border-green-600",
+                error: "bg-red-100 text-red-800 border-red-600",
               },
             }}
           />

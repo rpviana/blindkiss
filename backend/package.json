@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development npm run build && npm run start",
     "build": "npx prisma generate && node ./build.mjs",
-    "start": "node --enable-source-maps --env-file=.env ./dist/index.mjs",
+    "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:push": "npx prisma db push",
     "db:pull": "npx prisma db pull",

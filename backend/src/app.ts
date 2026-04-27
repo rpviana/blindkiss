@@ -33,6 +33,7 @@ app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 app.use("/api", router);
+app.use("/", router); // Fallback for when the proxy strips the /api prefix
 
 app.use(
   (err: unknown, req: Request, res: Response, _next: NextFunction): void => {

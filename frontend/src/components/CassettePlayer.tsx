@@ -35,6 +35,11 @@ export function CassettePlayer() {
     setIsPlaying(true);
   };
 
+  const selectTrack = (index: number) => {
+    setCurrentTrackIndex(index);
+    setIsPlaying(true);
+  };
+
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       const current = audioRef.current.currentTime;
@@ -47,6 +52,17 @@ export function CassettePlayer() {
     nextTrack();
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const ratio = Math.min(Math.max(clickX / rect.width, 0), 1);
+    const duration = audioRef.current.duration;
+    if (!Number.isFinite(duration) || duration <= 0) return;
+    audioRef.current.currentTime = duration * ratio;
+    setProgress(ratio * 100);
+  };
+
   if (!tracks.length) {
     return (
       <div className="border-2 border-border p-6 bg-card text-center font-mono text-muted-foreground">
@@ -56,7 +72,7 @@ export function CassettePlayer() {
   }
 
   return (
-    <div className="border-4 border-border bg-card p-4 md:p-6 w-full max-w-md mx-auto shadow-[8px_8px_0px_0px_rgba(145,8,2,0.2)]">
+    <div className="border-4 border-border bg-card p-4 md:p-6 w-full max-w-2xl mx-auto shadow-[8px_8px_0px_0px_rgba(145,8,2,0.2)]">
       <audio
         ref={audioRef}
         src={currentTrack?.url}
@@ -100,7 +116,10 @@ export function CassettePlayer() {
       </div>
 
       {/* Progress */}
-      <div className="h-2 bg-border/20 mb-6 relative border border-border">
+      <div
+        onClick={handleSeek}
+        className="h-2 bg-border/20 mb-6 relative border border-border cursor-pointer"
+      >
         <div
           className="absolute top-0 left-0 h-full bg-primary transition-all duration-100 ease-linear"
           style={{ width: `${progress}%` }}
@@ -129,6 +148,25 @@ export function CassettePlayer() {
         >
           <SkipForward size={20} className="md:w-6 md:h-6" />
         </button>
+      </div>
+
+      <div className="mt-6 border-t-2 border-dashed border-border pt-4">
+        <p className="font-mono text-[10px] uppercase mb-2 text-foreground/60">Playlist</p>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {tracks.map((track, index) => (
+            <button
+              key={track.id}
+              onClick={() => selectTrack(index)}
+              className={`shrink-0 px-3 py-2 border-2 font-mono text-xs uppercase transition-colors ${
+                index === currentTrackIndex
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border hover:bg-muted"
+              }`}
+            >
+              {track.title}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

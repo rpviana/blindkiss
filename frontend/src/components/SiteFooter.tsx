@@ -1,4 +1,5 @@
 import { useGetSiteSettings } from "@/api-client";
+import { Link } from "wouter";
 
 export function SiteFooter() {
   const { data: settings } = useGetSiteSettings();
@@ -15,6 +16,10 @@ export function SiteFooter() {
         <div className="font-display text-2xl tracking-widest text-primary mt-4">
           // BLINDKISS MMXXVI //
         </div>
+
+        <Link href="/vault" className="font-mono text-xs text-primary/80 hover:text-primary uppercase tracking-wider">
+          [ vault_access ]
+        </Link>
         
         <div className="text-xs font-mono text-foreground/50 uppercase mt-8">
           RUÍDO COM BEIJOS. TODOS OS DIREITOS RESERVADOS.

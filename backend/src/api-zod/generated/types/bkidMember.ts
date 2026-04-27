@@ -9,6 +9,7 @@
 export interface BkidMember {
   id: number;
   serial: string;
+  supporterNumber?: number | null;
   name: string;
   email?: string | null;
   photoUrl?: string | null;

@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { z } from "zod";
 import { CreateTrackBody, DeleteTrackParams } from "../api-zod/index";
 import { prisma } from "../db/index";
 import { requireAdmin } from "../lib/auth";
@@ -31,6 +32,21 @@ router.get("/tracks", async (_req, res) => {
 router.post("/tracks", requireAdmin, async (req, res) => {
   const body = CreateTrackBody.parse(req.body);
   const row = await prisma.tracks.create({
+    data: {
+      title: body.title,
+      artist: body.artist ?? null,
+      url: body.url,
+      duration_sec: body.durationSec ?? null,
+    },
+  });
+  res.json(serialize(row));
+});
+
+router.patch("/tracks/:id", requireAdmin, async (req, res) => {
+  const id = z.coerce.number().int().parse(req.params.id);
+  const body = CreateTrackBody.parse(req.body);
+  const row = await prisma.tracks.update({
+    where: { id },
     data: {
       title: body.title,
       artist: body.artist ?? null,

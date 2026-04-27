@@ -19,6 +19,7 @@ import {
   useListTracks,
   useCreateTrack,
   useDeleteTrack,
+  useUpdateTrackItem,
   getListTracksQueryKey,
   getAdminMeQueryKey,
   useAdminListAnnouncements,
@@ -28,12 +29,33 @@ import {
   useUpdateBkidMember,
   useDeleteBkidMember,
   AnnouncementInput,
-  Announcement
+  Announcement,
+  useAdminListRecruitmentApplications,
+  useUpdateRecruitmentApplication,
+  useDeleteRecruitmentApplication,
+  useAdminListVaultAssets,
+  useCreateVaultAsset,
+  useUpdateVaultAsset,
+  useDeleteVaultAsset,
+  VaultAssetInput,
+  useGetPressKit,
+  useUpdatePressKit
 } from "@/api-client";
 
 import { LogOut, Plus, Trash2, Edit2, Check, X, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+
+type AdminTab =
+  | "settings"
+  | "events"
+  | "bkid"
+  | "content"
+  | "tracks"
+  | "announcements"
+  | "auditions"
+  | "vault"
+  | "presskit";
 
 export default function Admin() {
   const qc = useQueryClient();
@@ -43,7 +65,18 @@ export default function Admin() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [activeTab, setActiveTab] = useState<"settings" | "events" | "bkid" | "content" | "tracks" | "announcements">("settings");
+  const [activeTab, setActiveTab] = useState<AdminTab>("settings");
+  const tabs: Array<{ id: AdminTab; label: string }> = [
+    { id: "settings", label: "definições" },
+    { id: "events", label: "eventos" },
+    { id: "bkid", label: "bk-id" },
+    { id: "content", label: "conteúdo" },
+    { id: "tracks", label: "faixas" },
+    { id: "announcements", label: "anúncios" },
+    { id: "auditions", label: "audições" },
+    { id: "vault", label: "vault" },
+    { id: "presskit", label: "press kit" },
+  ];
 
 
   if (adminLoading) {
@@ -120,17 +153,10 @@ export default function Admin() {
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Sidebar / Navigation */}
         <aside className="w-full md:w-64 border-b-4 md:border-b-0 md:border-r-4 border-border bg-muted/20 flex md:flex-col p-2 md:p-4 gap-2 overflow-x-auto md:overflow-x-visible no-scrollbar">
-          {[
-            { id: "settings", label: "definições" },
-            { id: "events", label: "eventos" },
-            { id: "bkid", label: "bk-id" },
-            { id: "content", label: "conteúdo" },
-            { id: "tracks", label: "faixas" },
-            { id: "announcements", label: "anúncios" }
-          ].map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={`text-left font-display tracking-widest text-base md:text-lg px-4 py-2 md:py-3 border-2 border-transparent transition-all uppercase whitespace-nowrap md:whitespace-normal ${
                 activeTab === tab.id 
                   ? "bg-foreground text-background border-foreground md:translate-x-2 shadow-[4px_4px_0px_0px_rgba(145,8,2,1)]" 
@@ -149,8 +175,11 @@ export default function Admin() {
             {activeTab === "events" && <EventsTab />}
             {activeTab === "bkid" && <BkidTab />}
             {activeTab === "content" && <ContentTab />}
-            {activeTab === "tracks" && <TracksTab />}
-            {activeTab === "announcements" && <AnnouncementsTab />}
+              {activeTab === "tracks" && <TracksTab />}
+              {activeTab === "announcements" && <AnnouncementsTab />}
+              {activeTab === "auditions" && <AuditionsTab />}
+              {activeTab === "vault" && <VaultTab />}
+              {activeTab === "presskit" && <PressKitTab />}
 
           </div>
         </main>
@@ -649,16 +678,67 @@ function TracksTab() {
   const { data: tracks = [] } = useListTracks();
   const createTrack = useCreateTrack();
   const deleteTrack = useDeleteTrack();
+  const updateTrack = useUpdateTrackItem();
 
   const [form, setForm] = useState({ title: "", artist: "BLINDKISS", url: "" });
+  const [sourceMode, setSourceMode] = useState<"url" | "file">("url");
+  const [selectedFileName, setSelectedFileName] = useState<string>("");
+  const [editingTrackId, setEditingTrackId] = useState<number | null>(null);
+  const isSaving = createTrack.isPending || updateTrack.isPending;
+
+  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = typeof reader.result === "string" ? reader.result : "";
+      if (!dataUrl.startsWith("data:audio/")) {
+        toast.error("Ficheiro inválido. Usa um ficheiro de áudio.");
+        return;
+      }
+      setForm((prev) => ({ ...prev, url: dataUrl }));
+      setSelectedFileName(file.name);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.url) return;
-    createTrack.mutate({ data: { ...form, durationSec: null } }, {
-      onSuccess: () => {
-        qc.invalidateQueries({ queryKey: getListTracksQueryKey() });
+    const payload = { ...form, durationSec: null };
+
+    if (editingTrackId) {
+      updateTrack.mutate(
+        { id: editingTrackId, data: payload },
+        {
+          onSuccess: () => {
+            qc.invalidateQueries({ queryKey: getListTracksQueryKey() });
+            setForm({ title: "", artist: "BLINDKISS", url: "" });
+            setSelectedFileName("");
+            setSourceMode("url");
+            setEditingTrackId(null);
+            toast.success("Faixa atualizada.");
+          },
+          onError: () => toast.error("Erro ao atualizar faixa."),
+        },
+      );
+      return;
+    }
+
+    createTrack.mutate({ data: payload }, {
+      onSuccess: (created) => {
+        qc.setQueryData(getListTracksQueryKey(), (prev: unknown) => {
+          if (!Array.isArray(prev)) return [created];
+          return [...prev, created];
+        });
         setForm({ title: "", artist: "BLINDKISS", url: "" });
+        setSelectedFileName("");
+        setSourceMode("url");
+        toast.success("Faixa adicionada.");
+      },
+      onError: () => {
+        toast.error("Erro ao adicionar faixa.");
       }
     });
   };
@@ -677,12 +757,72 @@ function TracksTab() {
           <input value={form.artist} onChange={e=>setForm({...form, artist: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background" />
         </div>
         <div className="md:flex-[2]">
-          <label className="block font-mono text-xs uppercase mb-1">URL de Áudio (.mp3)</label>
-          <input required value={form.url} onChange={e=>setForm({...form, url: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background" />
+          <label className="block font-mono text-xs uppercase mb-1">Fonte de Áudio</label>
+          <div className="flex gap-2 mb-2">
+            <button
+              type="button"
+              onClick={() => {
+                setSourceMode("url");
+                setSelectedFileName("");
+                setForm((prev) => ({ ...prev, url: "" }));
+              }}
+              className={`px-3 py-1 border-2 font-mono text-xs ${sourceMode === "url" ? "border-primary bg-primary/10" : "border-border"}`}
+            >
+              URL
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSourceMode("file");
+                setForm((prev) => ({ ...prev, url: "" }));
+              }}
+              className={`px-3 py-1 border-2 font-mono text-xs ${sourceMode === "file" ? "border-primary bg-primary/10" : "border-border"}`}
+            >
+              FICHEIRO DO PC
+            </button>
+          </div>
+          {sourceMode === "url" ? (
+            <input
+              required
+              value={form.url}
+              onChange={e=>setForm({...form, url: e.target.value})}
+              className="w-full border-2 border-border p-2 font-mono bg-background"
+              placeholder="https://...mp3"
+            />
+          ) : (
+            <div className="space-y-2">
+              <input
+                required={!form.url}
+                type="file"
+                accept="audio/*"
+                onChange={handleAudioUpload}
+                className="w-full border-2 border-border p-2 font-mono bg-background text-xs"
+              />
+              <p className="font-mono text-[10px] text-foreground/70">
+                {selectedFileName
+                  ? `Ficheiro carregado: ${selectedFileName}`
+                  : "Seleciona um ficheiro de áudio para guardar na DB."}
+              </p>
+            </div>
+          )}
         </div>
-        <button type="submit" disabled={createTrack.isPending} className="bg-primary text-primary-foreground px-6 py-3 border-2 border-primary font-display tracking-widest uppercase hover:bg-foreground">
-          ADICIONAR
+        <button type="submit" disabled={isSaving} className="bg-primary text-primary-foreground px-6 py-3 border-2 border-primary font-display tracking-widest uppercase hover:bg-foreground disabled:opacity-50">
+          {editingTrackId ? "ATUALIZAR" : "ADICIONAR"}
         </button>
+        {editingTrackId && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingTrackId(null);
+              setForm({ title: "", artist: "BLINDKISS", url: "" });
+              setSelectedFileName("");
+              setSourceMode("url");
+            }}
+            className="border-2 border-border px-6 py-3 font-display tracking-widest uppercase hover:bg-muted"
+          >
+            CANCELAR
+          </button>
+        )}
       </form>
 
       {/* Desktop Table */}
@@ -702,7 +842,19 @@ function TracksTab() {
                 <td className="p-3 text-foreground/50">{idx + 1}</td>
                 <td className="p-3 font-bold">{t.title}</td>
                 <td className="p-3">{t.artist}</td>
-                <td className="p-3">
+                <td className="p-3 flex gap-2">
+                  <button
+                    onClick={() => {
+                      setEditingTrackId(t.id);
+                      setForm({ title: t.title, artist: t.artist || "BLINDKISS", url: t.url });
+                      const isDataUrl = t.url.startsWith("data:audio/");
+                      setSourceMode(isDataUrl ? "file" : "url");
+                      setSelectedFileName(isDataUrl ? "Áudio guardado na DB" : "");
+                    }}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <Edit2 size={18}/>
+                  </button>
                   <button onClick={() => {
                     if(confirm("Eliminar esta faixa?")) {
                       deleteTrack.mutate({ id: t.id }, { 
@@ -732,17 +884,31 @@ function TracksTab() {
                 <p className="font-mono text-xs text-foreground/60">{t.artist}</p>
               </div>
             </div>
-            <button onClick={() => {
-              if(confirm("Eliminar esta faixa?")) {
-                deleteTrack.mutate({ id: t.id }, { 
-                  onSuccess: () => {
-                    toast.success("Faixa eliminada.");
-                    qc.invalidateQueries({ queryKey: getListTracksQueryKey() });
-                  },
-                  onError: () => toast.error("Erro ao eliminar faixa.")
-                });
-              }
-            }} className="text-red-600 p-2"><Trash2 size={20}/></button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setEditingTrackId(t.id);
+                  setForm({ title: t.title, artist: t.artist || "BLINDKISS", url: t.url });
+                  const isDataUrl = t.url.startsWith("data:audio/");
+                  setSourceMode(isDataUrl ? "file" : "url");
+                  setSelectedFileName(isDataUrl ? "Áudio guardado na DB" : "");
+                }}
+                className="text-blue-600 p-2"
+              >
+                <Edit2 size={20}/>
+              </button>
+              <button onClick={() => {
+                if(confirm("Eliminar esta faixa?")) {
+                  deleteTrack.mutate({ id: t.id }, { 
+                    onSuccess: () => {
+                      toast.success("Faixa eliminada.");
+                      qc.invalidateQueries({ queryKey: getListTracksQueryKey() });
+                    },
+                    onError: () => toast.error("Erro ao eliminar faixa.")
+                  });
+                }
+              }} className="text-red-600 p-2"><Trash2 size={20}/></button>
+            </div>
           </div>
         ))}
       </div>
@@ -882,6 +1048,308 @@ function AnnouncementsTab() {
           </div>
         ))}
         {announcements.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/20 font-mono">NENHUM ANÚNCIO CRIADO</div>}
+      </div>
+    </div>
+  );
+}
+
+function AuditionsTab() {
+  const { data: applications = [] } = useAdminListRecruitmentApplications();
+  const update = useUpdateRecruitmentApplication();
+  const remove = useDeleteRecruitmentApplication();
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-display text-3xl uppercase">Audições Recebidas</h2>
+      <div className="space-y-4">
+        {applications.map((application) => (
+          <div key={application.id} className="border-4 border-border bg-card p-4 md:p-6 space-y-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div>
+                <h3 className="font-display text-2xl uppercase">{application.name}</h3>
+                <p className="font-mono text-xs text-foreground/60">
+                  {application.instrument || "INSTRUMENTO NÃO INDICADO"} // {format(new Date(application.createdAt), "dd/MM/yyyy HH:mm")}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  value={application.status}
+                  onChange={(e) => {
+                    const nextStatus = e.target.value;
+                    if (
+                      nextStatus === "pending" ||
+                      nextStatus === "reviewing" ||
+                      nextStatus === "shortlisted" ||
+                      nextStatus === "rejected"
+                    ) {
+                      update.mutate(
+                        { id: application.id, status: nextStatus },
+                        {
+                          onSuccess: () => toast.success("Estado atualizado."),
+                          onError: () => toast.error("Erro ao atualizar estado."),
+                        },
+                      );
+                    }
+                  }}
+                  className="border-2 border-border bg-background p-2 font-mono text-xs uppercase"
+                >
+                  <option value="pending">PENDING</option>
+                  <option value="reviewing">REVIEWING</option>
+                  <option value="shortlisted">SHORTLISTED</option>
+                  <option value="rejected">REJECTED</option>
+                </select>
+                <button
+                  onClick={() =>
+                    confirm("Eliminar candidatura?") &&
+                    remove.mutate(application.id, {
+                      onSuccess: () => toast.success("Candidatura eliminada."),
+                      onError: () => toast.error("Erro ao eliminar candidatura."),
+                    })
+                  }
+                  className="text-red-600 hover:text-red-800"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+            <p className="font-mono text-sm">Email: {application.email}</p>
+            <p className="font-mono text-sm">Telefone: {application.phone}</p>
+            <a href={application.mediaUrl} target="_blank" rel="noreferrer" className="inline-block font-mono text-sm text-primary underline break-all">
+              {application.mediaUrl}
+            </a>
+            {application.message && <p className="font-mono text-sm whitespace-pre-wrap">{application.message}</p>}
+          </div>
+        ))}
+        {applications.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NENHUMA AUDIÇÃO</div>}
+      </div>
+    </div>
+  );
+}
+
+function VaultTab() {
+  const { data: assets = [] } = useAdminListVaultAssets();
+  const create = useCreateVaultAsset();
+  const update = useUpdateVaultAsset();
+  const remove = useDeleteVaultAsset();
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<VaultAssetInput>({
+    assetType: "setlist_pdf",
+    title: "",
+    description: "",
+    fileUrl: "",
+    previewUrl: "",
+    isActive: true,
+    sortOrder: 0,
+  });
+
+  const resetForm = () =>
+    setForm({
+      assetType: "setlist_pdf",
+      title: "",
+      description: "",
+      fileUrl: "",
+      previewUrl: "",
+      isActive: true,
+      sortOrder: 0,
+    });
+
+  const save = () => {
+    if (!form.title || !form.fileUrl) {
+      toast.error("Título e URL são obrigatórios.");
+      return;
+    }
+    if (editingId) {
+      update.mutate(
+        { id: editingId, data: form },
+        {
+          onSuccess: () => {
+            toast.success("Asset atualizado.");
+            setEditingId(null);
+            resetForm();
+          },
+          onError: () => toast.error("Erro ao atualizar asset."),
+        },
+      );
+      return;
+    }
+    create.mutate(form, {
+      onSuccess: () => {
+        toast.success("Asset criado.");
+        resetForm();
+      },
+      onError: () => toast.error("Erro ao criar asset."),
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-display text-3xl uppercase">Vault Assets</h2>
+      <div className="border-4 border-border bg-card p-6 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <select value={form.assetType} onChange={(e) => setForm({ ...form, assetType: e.target.value as VaultAssetInput["assetType"] })} className="border-2 border-border bg-background p-2 font-mono">
+            <option value="setlist_pdf">SETLIST PDF</option>
+            <option value="backstage_photo">BACKSTAGE PHOTO</option>
+            <option value="wallpaper">WALLPAPER</option>
+          </select>
+          <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Título" className="border-2 border-border bg-background p-2 font-mono" />
+          <input value={form.fileUrl} onChange={(e) => setForm({ ...form, fileUrl: e.target.value })} placeholder="URL ficheiro" className="border-2 border-border bg-background p-2 font-mono md:col-span-2" />
+          <input value={form.previewUrl || ""} onChange={(e) => setForm({ ...form, previewUrl: e.target.value })} placeholder="URL preview (opcional)" className="border-2 border-border bg-background p-2 font-mono md:col-span-2" />
+          <textarea value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descrição" className="border-2 border-border bg-background p-2 font-mono md:col-span-2 h-20" />
+          <input type="number" value={form.sortOrder || 0} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })} className="border-2 border-border bg-background p-2 font-mono" />
+          <label className="flex items-center gap-2 font-mono text-sm">
+            <input type="checkbox" checked={Boolean(form.isActive)} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} className="w-5 h-5 accent-primary" />
+            Ativo
+          </label>
+        </div>
+        <div className="flex gap-3">
+          <button onClick={save} className="bg-primary text-primary-foreground px-6 py-2 font-display uppercase tracking-widest hover:bg-foreground">
+            {editingId ? "ATUALIZAR" : "CRIAR"}
+          </button>
+          {editingId && (
+            <button onClick={() => { setEditingId(null); resetForm(); }} className="border-2 border-border px-6 py-2 font-display uppercase tracking-widest hover:bg-muted">
+              CANCELAR
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {assets.map((asset) => (
+          <div key={asset.id} className="border-4 border-border bg-card p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <p className="font-mono text-[10px] uppercase text-foreground/60">{asset.assetType} // ordem {asset.sortOrder}</p>
+              <h3 className="font-display text-xl uppercase">{asset.title}</h3>
+              <a href={asset.fileUrl} target="_blank" rel="noreferrer" className="font-mono text-xs text-primary underline break-all">{asset.fileUrl}</a>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setEditingId(asset.id);
+                  setForm({
+                    assetType: asset.assetType,
+                    title: asset.title,
+                    description: asset.description || "",
+                    fileUrl: asset.fileUrl,
+                    previewUrl: asset.previewUrl || "",
+                    isActive: asset.isActive,
+                    sortOrder: asset.sortOrder,
+                  });
+                }}
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <Edit2 size={18} />
+              </button>
+              <button
+                onClick={() =>
+                  confirm("Eliminar asset do vault?") &&
+                  remove.mutate(asset.id, {
+                    onSuccess: () => toast.success("Asset removido."),
+                    onError: () => toast.error("Erro ao remover asset."),
+                  })
+                }
+                className="text-red-600 hover:text-red-800"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
+        {assets.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NENHUM ASSET</div>}
+      </div>
+    </div>
+  );
+}
+
+function PressKitTab() {
+  const { data: pressKit } = useGetPressKit();
+  const update = useUpdatePressKit();
+  const [form, setForm] = useState({
+    bioShort: "",
+    technicalRider: "",
+    photoUrls: [""],
+  });
+
+  useEffect(() => {
+    if (!pressKit) return;
+    setForm({
+      bioShort: pressKit.bioShort,
+      technicalRider: pressKit.technicalRider,
+      photoUrls: pressKit.photoUrls.length > 0 ? pressKit.photoUrls : [""],
+    });
+  }, [pressKit]);
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-display text-3xl uppercase">Press Kit</h2>
+      <div className="border-4 border-border bg-card p-6 space-y-4">
+        <div>
+          <label className="block font-mono text-xs uppercase mb-1">Bio Curta</label>
+          <textarea value={form.bioShort} onChange={(e) => setForm({ ...form, bioShort: e.target.value })} className="w-full border-2 border-border bg-background p-2 font-mono h-24" />
+        </div>
+        <div>
+          <label className="block font-mono text-xs uppercase mb-1">Technical Rider</label>
+          <textarea value={form.technicalRider} onChange={(e) => setForm({ ...form, technicalRider: e.target.value })} className="w-full border-2 border-border bg-background p-2 font-mono h-48" />
+        </div>
+        <div>
+          <label className="block font-mono text-xs uppercase mb-2">Fotos (uma por campo)</label>
+          <div className="space-y-2">
+            {form.photoUrls.map((url, index) => (
+              <div key={`photo-${index}`} className="flex gap-2">
+                <input
+                  value={url}
+                  onChange={(e) => {
+                    const next = [...form.photoUrls];
+                    next[index] = e.target.value;
+                    setForm({ ...form, photoUrls: next });
+                  }}
+                  placeholder={`URL da foto #${index + 1}`}
+                  className="flex-1 border-2 border-border bg-background p-2 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (form.photoUrls.length === 1) {
+                      setForm({ ...form, photoUrls: [""] });
+                      return;
+                    }
+                    setForm({
+                      ...form,
+                      photoUrls: form.photoUrls.filter((_, i) => i !== index),
+                    });
+                  }}
+                  className="px-3 border-2 border-border font-mono text-xs hover:bg-muted"
+                >
+                  REMOVER
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, photoUrls: [...form.photoUrls, ""] })}
+              className="border-2 border-border px-4 py-2 font-mono text-xs hover:bg-muted"
+            >
+              + ADICIONAR FOTO
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={() =>
+            update.mutate(
+              {
+                bioShort: form.bioShort,
+                technicalRider: form.technicalRider,
+                photoUrls: form.photoUrls.map((line) => line.trim()).filter(Boolean),
+              },
+              {
+                onSuccess: () => toast.success("Press kit atualizado."),
+                onError: () => toast.error("Erro ao atualizar press kit."),
+              },
+            )
+          }
+          className="bg-primary text-primary-foreground px-6 py-2 font-display uppercase tracking-widest hover:bg-foreground"
+        >
+          GUARDAR PRESS KIT
+        </button>
       </div>
     </div>
   );

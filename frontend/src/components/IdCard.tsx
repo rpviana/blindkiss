@@ -5,11 +5,12 @@ import defaultPhoto from "@assets/image_1777245746860.png";
 export interface IdCardProps {
   name: string;
   serial: string;
+  supporterNumber?: number | null;
   photoUrl?: string | null;
 }
 
 export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
-  ({ name, serial, photoUrl }, ref) => {
+  ({ name, serial, supporterNumber, photoUrl }, ref) => {
     return (
       <div 
         ref={ref}
@@ -71,6 +72,15 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
                 {serial || "BK-00000"}
               </div>
             </div>
+
+            {typeof supporterNumber === "number" && supporterNumber > 0 && (
+              <div>
+                <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">NÚMERO DE APOIANTE</div>
+                <div className="font-display text-xl text-[#111] tracking-wider">
+                  #{String(supporterNumber).padStart(4, "0")}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Footer Bar */}

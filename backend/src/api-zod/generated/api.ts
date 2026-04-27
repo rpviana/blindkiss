@@ -129,6 +129,7 @@ export const DeleteEventResponse = zod.object({
 export const ListBkidMembersResponseItem = zod.object({
   id: zod.number(),
   serial: zod.string(),
+  supporterNumber: zod.number().nullish(),
   name: zod.string(),
   email: zod.string().nullish(),
   photoUrl: zod.string().nullish(),
@@ -148,6 +149,7 @@ export const CreateBkidMemberBody = zod.object({
 export const CreateBkidMemberResponse = zod.object({
   id: zod.number(),
   serial: zod.string(),
+  supporterNumber: zod.number().nullish(),
   name: zod.string(),
   email: zod.string().nullish(),
   photoUrl: zod.string().nullish(),

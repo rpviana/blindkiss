@@ -13,6 +13,8 @@ import Home from "@/pages/Home";
 import Archive from "@/pages/Archive";
 import Bkid from "@/pages/Bkid";
 import Admin from "@/pages/Admin";
+import Vault from "@/pages/Vault";
+import Press from "@/pages/Press";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +35,8 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/archive" component={Archive} />
           <Route path="/bk-id" component={Bkid} />
+          <Route path="/vault" component={Vault} />
+          <Route path="/press" component={Press} />
           <Route path="/admin" component={Admin} />
           <Route component={NotFound} />
         </Switch>

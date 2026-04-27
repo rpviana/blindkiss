@@ -34,6 +34,7 @@ router.post("/auth/logout", (_req, res) => {
 router.get("/auth/me", (req, res) => {
   const session = readSession(req);
   if (!session) {
+    clearSessionCookie(res);
     res.json({ authenticated: false, username: null });
     return;
   }

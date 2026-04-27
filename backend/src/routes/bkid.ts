@@ -1,13 +1,36 @@
 import { Router, type IRouter } from "express";
+import crypto from "node:crypto";
+import { z } from "zod";
 import { CreateBkidMemberBody } from "../api-zod/index";
 import { prisma } from "../db/index";
 import { requireAdmin } from "../lib/auth";
 
 const router: IRouter = Router();
+const CreateBkidMemberWithRequiredEmailBody = CreateBkidMemberBody.extend({
+  email: z.string().trim().email(),
+});
+const RecoverBkidBody = z.object({
+  name: z.string().trim().min(1),
+  email: z.string().trim().email().transform((value) => normalizeEmail(value)),
+});
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+function normalizeName(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toUpperCase();
+}
 
 function serialize(row: {
   id: number;
   serial: string;
+  supporter_number: number | null;
   name: string;
   email: string | null;
   photo_url: string | null;
@@ -16,11 +39,22 @@ function serialize(row: {
   return {
     id: row.id,
     serial: row.serial,
+    supporterNumber: row.supporter_number,
     name: row.name,
     email: row.email,
     photoUrl: row.photo_url,
     createdAt: row.created_at.toISOString(),
   };
+}
+
+async function generateUniqueSerial(year: number): Promise<string> {
+  for (let i = 0; i < 50; i += 1) {
+    const randomSuffix = crypto.randomInt(0, 1_000_000).toString().padStart(6, "0");
+    const serial = `BK-${year}-${randomSuffix}`;
+    const existing = await prisma.bkid_members.findUnique({ where: { serial } });
+    if (!existing) return serial;
+  }
+  throw new Error("Failed to generate unique BK-ID serial");
 }
 
 router.get("/bkid", requireAdmin, async (_req, res) => {
@@ -31,16 +65,44 @@ router.get("/bkid", requireAdmin, async (_req, res) => {
 });
 
 router.post("/bkid", async (req, res) => {
-  const body = CreateBkidMemberBody.parse(req.body);
-  const count = await prisma.bkid_members.count();
-  const next = count + 1;
+  const body = CreateBkidMemberWithRequiredEmailBody.parse(req.body);
+  const normalizedEmail = normalizeEmail(body.email);
+  const normalizedName = normalizeName(body.name);
+
+  if (!normalizedName) {
+    res.status(400).json({ ok: false, message: "Name is required" });
+    return;
+  }
+
+  const existingByEmail = await prisma.bkid_members.findFirst({
+    where: {
+      email: {
+        equals: normalizedEmail,
+        mode: "insensitive",
+      },
+    },
+  });
+  if (existingByEmail) {
+    res.status(409).json({
+      ok: false,
+      message: "Email already registered in BK-ID",
+    });
+    return;
+  }
+
   const year = new Date().getFullYear();
-  const serial = `BK-${year}-${String(next).padStart(3, "0")}`;
+  const serial = await generateUniqueSerial(year);
+  const aggregate = await prisma.bkid_members.aggregate({
+    _max: { supporter_number: true },
+  });
+  const nextSupporterNumber = (aggregate._max.supporter_number ?? 0) + 1;
+
   const row = await prisma.bkid_members.create({
     data: {
       serial,
-      name: body.name,
-      email: body.email ?? null,
+      supporter_number: nextSupporterNumber,
+      name: normalizedName,
+      email: normalizedEmail,
       photo_url: body.photoUrl ?? null,
     },
   });
@@ -58,14 +120,83 @@ router.get("/bkid/stats", async (_req, res) => {
   });
 });
 
+router.post("/bkid/recover", async (req, res) => {
+  const body = RecoverBkidBody.parse(req.body);
+  const normalizedName = normalizeName(body.name);
+  const emailCandidates = await prisma.bkid_members.findMany({
+    where: {
+      email: {
+        equals: body.email,
+        mode: "insensitive",
+      },
+    },
+    orderBy: [{ id: "desc" }],
+  });
+
+  if (emailCandidates.length > 0) {
+    const exactByNameAndEmail = emailCandidates.find(
+      (item) => normalizeName(item.name) === normalizedName,
+    );
+    const member = exactByNameAndEmail ?? emailCandidates[0];
+    res.json(serialize(member));
+    return;
+  }
+
+  // Legacy fallback for rows with bad/empty email: recover by normalized name only.
+  const nameCandidates = await prisma.bkid_members.findMany({
+    where: {
+      name: {
+        contains: body.name.trim(),
+        mode: "insensitive",
+      },
+    },
+    orderBy: [{ id: "desc" }],
+    take: 20,
+  });
+  const exactByName = nameCandidates.find(
+    (item) => normalizeName(item.name) === normalizedName,
+  );
+
+  if (!exactByName) {
+    res.status(404).json({ ok: false });
+    return;
+  }
+  res.json(serialize(exactByName));
+});
+
 router.patch("/bkid/:id", requireAdmin, async (req, res) => {
   const id = parseInt(req.params.id as string);
   const body = CreateBkidMemberBody.partial().parse(req.body);
+
+  const normalizedEmail =
+    typeof body.email === "string" ? normalizeEmail(body.email) : body.email;
+  const normalizedName =
+    typeof body.name === "string" ? normalizeName(body.name) : body.name;
+
+  if (typeof normalizedEmail === "string") {
+    const existingByEmail = await prisma.bkid_members.findFirst({
+      where: {
+        id: { not: id },
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
+      },
+    });
+    if (existingByEmail) {
+      res.status(409).json({
+        ok: false,
+        message: "Email already registered in BK-ID",
+      });
+      return;
+    }
+  }
+
   const row = await prisma.bkid_members.update({
     where: { id },
     data: {
-      name: body.name,
-      email: body.email,
+      name: normalizedName,
+      email: normalizedEmail,
       photo_url: body.photoUrl,
     },
   });

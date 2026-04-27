@@ -1,11 +1,11 @@
 {
   "experimentalServices": {
-    "frontend": {
+    "blindkiss_frontend": {
       "entrypoint": "frontend",
       "routePrefix": "/",
       "framework": "vite"
     },
-    "backend": {
+    "blindkiss_backend": {
       "entrypoint": "backend",
       "routePrefix": "/api"
     }

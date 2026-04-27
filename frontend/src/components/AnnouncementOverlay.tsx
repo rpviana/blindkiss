@@ -134,7 +134,7 @@ export function AnnouncementOverlay() {
                   onClick={() => handleDismiss(expandedAnnouncement.id)}
                   className="py-4 px-12 font-display text-2xl uppercase tracking-widest border-4 border-primary bg-primary text-primary-foreground hover:bg-foreground hover:text-background hover:border-foreground transition-all active:scale-95"
                 >
-                  ACKNOWLEDGE
+                  RECONHECIDO
                 </button>
                 
                 {/* Decorative bits */}

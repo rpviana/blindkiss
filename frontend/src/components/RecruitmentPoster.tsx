@@ -14,13 +14,13 @@ export function RecruitmentPoster() {
       <div className="relative z-10 flex flex-col items-center text-center">
         {/* Title */}
         <h2 className="font-display text-7xl md:text-8xl tracking-tighter text-[#111] leading-none mb-2">
-          {settings.recruitmentTitle || "WANTED"}
+          {settings.recruitmentTitle || "PROCURA-SE"}
         </h2>
         
         <div className="w-full h-2 bg-[#111] mb-6"></div>
         
         <h3 className="font-display text-3xl md:text-4xl text-[#910802] mb-10 tracking-widest uppercase">
-          {settings.recruitmentSubtitle || "JOIN THE RIOT"}
+          {settings.recruitmentSubtitle || "JUNTA-TE AO DISTÚRBIO"}
         </h3>
 
         {/* Roles */}

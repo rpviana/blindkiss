@@ -16,7 +16,7 @@ export default function Archive() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="pt-24 pb-12 px-4 md:px-8 text-center border-b-8 border-border">
         <h1 className="font-display text-5xl md:text-7xl tracking-tighter uppercase mb-6 text-primary">
-          [ GIG ARCHIVE ]
+          [ ARQUIVO DE GIGS ]
         </h1>
         <p className="font-mono text-lg md:text-xl font-bold max-w-2xl mx-auto">
           RUÍDO AO VIVO. TESTEMUNHO DO CAOS.
@@ -36,7 +36,7 @@ export default function Archive() {
                 : "bg-card text-foreground hover:bg-muted"
             }`}
           >
-            UPCOMING RIOTS
+            PRÓXIMOS DISTÚRBIOS
           </button>
           <button
             onClick={() => setTab("past")}
@@ -46,22 +46,22 @@ export default function Archive() {
                 : "bg-card text-foreground hover:bg-muted"
             }`}
           >
-            PAST ECHOES
+            ECOS PASSADOS
           </button>
         </div>
 
         {/* Content */}
         {isLoading ? (
           <div className="font-mono text-xl text-center py-20 animate-pulse">
-            LOADING DATA...
+            A CARREGAR DADOS...
           </div>
         ) : events.length === 0 ? (
           <div className="border-4 border-dashed border-border py-32 text-center bg-muted/20">
             <p className="font-mono text-2xl font-bold uppercase">
-              {tab === "upcoming" ? "// NO UPCOMING RIOTS SCHEDULED //" : "// NO PAST ECHOES RECORDED //"}
+              {tab === "upcoming" ? "// NENHUM DISTÚRBIO AGENDADO //" : "// NENHUM ECO REGISTADO //"}
             </p>
             <p className="font-mono text-sm mt-4 text-foreground/60">
-              {tab === "upcoming" ? "STAY TUNED FOR CAOS." : "HISTORY IS EMPTY."}
+              {tab === "upcoming" ? "FICA ATENTO AO CAOS." : "A HISTÓRIA ESTÁ VAZIA."}
             </p>
           </div>
         ) : (

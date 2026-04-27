@@ -50,7 +50,7 @@ export function CassettePlayer() {
   if (!tracks.length) {
     return (
       <div className="border-2 border-border p-6 bg-card text-center font-mono text-muted-foreground">
-        [NO TRACKS LOADED]
+        [NENHUMA FAIXA CARREGADA]
       </div>
     );
   }
@@ -85,14 +85,14 @@ export function CassettePlayer() {
         
         {/* Label */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-white px-2 py-0.5 border-b border-l border-r border-border text-[10px] font-mono font-bold text-black uppercase tracking-wider whitespace-nowrap">
-          BLINDKISS MIXTAPE
+          MIXTAPE BLINDKISS
         </div>
       </div>
 
       {/* Track Info */}
       <div className="text-center mb-4 min-h-[3.5rem]">
         <h3 className="font-display text-lg md:text-xl text-primary truncate uppercase">
-          {currentTrack?.title || "UNKNOWN"}
+          {currentTrack?.title || "DESCONHECIDO"}
         </h3>
         <p className="font-mono text-xs md:text-sm text-foreground/80 truncate">
           {currentTrack?.artist || "BLINDKISS"}

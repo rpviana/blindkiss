@@ -39,7 +39,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           
           {/* Vertical Text */}
           <div className="absolute bottom-4 -right-10 origin-bottom-left -rotate-90 font-display text-white/30 text-4xl tracking-widest whitespace-nowrap pointer-events-none mix-blend-overlay">
-            AUTHORIZED
+            AUTORIZADO
           </div>
         </div>
 
@@ -50,7 +50,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
             <div>
               <h2 className="font-display text-3xl leading-none text-[#111] tracking-wider uppercase">BLINDKISS</h2>
               <div className="font-mono text-[10px] font-bold text-[#910802] uppercase tracking-widest mt-1">
-                Official Supporter ID
+                ID Oficial de Apoio
               </div>
             </div>
             <img src={logoUrl} alt="Logo" className="w-10 h-10 object-contain mix-blend-multiply" />
@@ -59,14 +59,14 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           {/* Details */}
           <div className="space-y-4 flex-1">
             <div>
-              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">MEMBER NAME</div>
+              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">NOME DO MEMBRO</div>
               <div className="font-mono font-bold text-lg text-[#111] uppercase leading-tight truncate">
-                {name || "UNKNOWN SUBJECT"}
+                {name || "INDIVÍDUO DESCONHECIDO"}
               </div>
             </div>
 
             <div>
-              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">SERIAL NUMBER</div>
+              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">NÚMERO DE SÉRIE</div>
               <div className="font-display text-2xl text-[#910802] tracking-widest">
                 {serial || "BK-00000"}
               </div>
@@ -76,8 +76,8 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           {/* Footer Bar */}
           <div className="mt-auto border-t-2 border-dashed border-[#111] pt-2 flex justify-between items-end">
              <div className="font-mono text-[8px] text-[#111] uppercase font-bold">
-               VALID NATIONWIDE<br/>
-               DO NOT DUPLICATE
+               VÁLIDO EM TODO O PAÍS<br/>
+               NÃO DUPLICAR
              </div>
              {/* Barcode mock */}
              <div className="h-8 w-32 flex gap-[2px] opacity-80 mix-blend-multiply items-end">
@@ -91,10 +91,9 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           </div>
         </div>
 
-        {/* Red Stamp Overlay */}
         <div className="absolute top-1/2 right-4 -translate-y-1/2 rotate-12 pointer-events-none opacity-40 mix-blend-multiply">
            <div className="border-4 border-[#910802] text-[#910802] p-2 font-display text-2xl tracking-widest">
-             VERIFIED
+             VERIFICADO
            </div>
         </div>
       </div>

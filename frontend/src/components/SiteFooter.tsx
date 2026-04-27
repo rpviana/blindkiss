@@ -17,7 +17,7 @@ export function SiteFooter() {
         </div>
         
         <div className="text-xs font-mono text-foreground/50 uppercase mt-8">
-          RUÍDO COM BEIJOS. ALL RIGHTS RESERVED.
+          RUÍDO COM BEIJOS. TODOS OS DIREITOS RESERVADOS.
         </div>
       </div>
     </footer>

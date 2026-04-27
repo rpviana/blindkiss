@@ -46,7 +46,7 @@ export default function Admin() {
 
 
   if (adminLoading) {
-    return <div className="min-h-screen flex items-center justify-center font-mono">LOADING ADMIN...</div>;
+    return <div className="min-h-screen flex items-center justify-center font-mono">A CARREGAR ADMIN...</div>;
   }
 
   if (!admin?.authenticated) {
@@ -54,7 +54,7 @@ export default function Admin() {
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="w-full max-w-md border-4 border-border bg-card p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
           <h1 className="font-display text-4xl mb-6 uppercase text-center border-b-4 border-border pb-4">
-            SYSTEM OVERRIDE
+            CONTROLO DO SISTEMA
           </h1>
           
           <form 
@@ -89,10 +89,10 @@ export default function Admin() {
               disabled={login.isPending}
               className="w-full py-4 bg-primary text-primary-foreground font-display text-xl tracking-widest uppercase hover:bg-foreground transition-colors"
             >
-              {login.isPending ? "AUTHENTICATING..." : "LOGIN"}
+              {login.isPending ? "A AUTENTICAR..." : "ENTRAR"}
             </button>
             <p className="text-center font-mono text-xs text-foreground/50 mt-4">
-              [ HINT: admin / blindkiss ]
+              [ DICA: admin / blindkiss ]
             </p>
           </form>
         </div>
@@ -103,29 +103,36 @@ export default function Admin() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b-4 border-border bg-card px-4 md:px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-        <h1 className="font-display text-xl md:text-2xl tracking-widest text-primary truncate mr-4">ADMIN CONSOLE</h1>
+        <h1 className="font-display text-xl md:text-2xl tracking-widest text-primary truncate mr-4">CONSOLA DE ADMIN</h1>
         <button 
           onClick={() => logout.mutate(undefined, { onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() }) })}
           className="flex items-center gap-2 font-mono text-xs md:text-sm font-bold hover:text-primary transition-colors shrink-0"
         >
-          <LogOut size={16} /> LOGOUT
+          <LogOut size={16} /> SAIR
         </button>
       </header>
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Sidebar / Navigation */}
         <aside className="w-full md:w-64 border-b-4 md:border-b-0 md:border-r-4 border-border bg-muted/20 flex md:flex-col p-2 md:p-4 gap-2 overflow-x-auto md:overflow-x-visible no-scrollbar">
-          {["settings", "events", "bkid", "content", "tracks", "announcements"].map((tab) => (
+          {[
+            { id: "settings", label: "definições" },
+            { id: "events", label: "eventos" },
+            { id: "bkid", label: "bk-id" },
+            { id: "content", label: "conteúdo" },
+            { id: "tracks", label: "faixas" },
+            { id: "announcements", label: "anúncios" }
+          ].map((tab) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab as any)}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
               className={`text-left font-display tracking-widest text-base md:text-lg px-4 py-2 md:py-3 border-2 border-transparent transition-all uppercase whitespace-nowrap md:whitespace-normal ${
-                activeTab === tab 
+                activeTab === tab.id 
                   ? "bg-foreground text-background border-foreground md:translate-x-2 shadow-[4px_4px_0px_0px_rgba(145,8,2,1)]" 
                   : "hover:border-border hover:bg-muted"
               }`}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </aside>
@@ -173,12 +180,12 @@ function SettingsTab() {
 
   return (
     <div className="border-4 border-border p-6 bg-card">
-      <h2 className="font-display text-3xl mb-6 uppercase border-b-4 border-border pb-2">Global Settings</h2>
+      <h2 className="font-display text-3xl mb-6 uppercase border-b-4 border-border pb-2">Definições Globais</h2>
       <form onSubmit={handleSubmit} className="space-y-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4 border-2 border-dashed border-border p-4">
-            <h3 className="font-mono font-bold uppercase text-primary">Colors</h3>
+            <h3 className="font-mono font-bold uppercase text-primary">Cores</h3>
             
             <div className="flex items-center gap-4">
               <input type="color" name="colorBackground" value={form.colorBackground} onChange={handleChange} className="w-12 h-12" />
@@ -251,7 +258,7 @@ function SettingsTab() {
         </div>
 
         <button type="submit" disabled={updateSettings.isPending} className="py-3 px-8 bg-primary text-primary-foreground font-display text-xl uppercase hover:bg-foreground transition-colors border-2 border-primary">
-          {updateSettings.isPending ? "SAVING..." : "SAVE SETTINGS"}
+          {updateSettings.isPending ? "A GUARDAR..." : "GUARDAR DEFINIÇÕES"}
         </button>
       </form>
     </div>
@@ -306,35 +313,35 @@ function EventsTab() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="font-display text-3xl uppercase">Gigs / Events</h2>
+        <h2 className="font-display text-3xl uppercase">Gigs / Eventos</h2>
         {!isAdding && !editingId && (
           <button onClick={() => setIsAdding(true)} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 font-mono font-bold border-2 border-primary hover:bg-background hover:text-primary transition-colors">
-            <Plus size={16} /> ADD EVENT
+            <Plus size={16} /> ADICIONAR EVENTO
           </button>
         )}
       </div>
 
       {(isAdding || editingId) && (
         <div className="border-4 border-border bg-card p-4 md:p-6">
-          <h3 className="font-display text-xl mb-4">{editingId ? "EDIT EVENT" : "NEW EVENT"}</h3>
+          <h3 className="font-display text-xl mb-4">{editingId ? "EDITAR EVENTO" : "NOVO EVENTO"}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-             <input placeholder="Title *" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Título *" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
              <input type="datetime-local" value={form.eventDate} onChange={e=>setForm({...form, eventDate: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
-             <input placeholder="Venue *" value={form.venue} onChange={e=>setForm({...form, venue: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
-             <input placeholder="City *" value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
-             <input placeholder="Address *" value={form.address} onChange={e=>setForm({...form, address: e.target.value})} className="border-2 border-border p-2 font-mono bg-background md:col-span-2" />
-             <input placeholder="Price (e.g. 10€)" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Local *" value={form.venue} onChange={e=>setForm({...form, venue: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Cidade *" value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Morada *" value={form.address} onChange={e=>setForm({...form, address: e.target.value})} className="border-2 border-border p-2 font-mono bg-background md:col-span-2" />
+             <input placeholder="Preço (ex: 10€)" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
              <input placeholder="Poster URL" value={form.posterUrl} onChange={e=>setForm({...form, posterUrl: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
              <input placeholder="Ticket URL" value={form.ticketUrl} onChange={e=>setForm({...form, ticketUrl: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
              <input placeholder="Maps URL" value={form.mapsUrl} onChange={e=>setForm({...form, mapsUrl: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
              <label className="flex items-center gap-2 md:col-span-2">
                <input type="checkbox" checked={form.forcePast} onChange={e=>setForm({...form, forcePast: e.target.checked})} className="w-5 h-5 accent-primary" />
-               <span className="font-mono text-sm font-bold">Force Past Status (Hide from Upcoming)</span>
+               <span className="font-mono text-sm font-bold">Forçar Estado Passado (Ocultar dos Próximos)</span>
              </label>
           </div>
           <div className="flex gap-4">
-            <button onClick={handleSave} className="flex-1 md:flex-none bg-foreground text-background px-6 py-3 font-display uppercase tracking-widest hover:bg-primary transition-colors">SAVE</button>
-            <button onClick={() => { setIsAdding(false); setEditingId(null); resetForm(); }} className="flex-1 md:flex-none border-2 border-border px-6 py-3 font-display uppercase tracking-widest hover:bg-muted transition-colors">CANCEL</button>
+            <button onClick={handleSave} className="flex-1 md:flex-none bg-foreground text-background px-6 py-3 font-display uppercase tracking-widest hover:bg-primary transition-colors">GUARDAR</button>
+            <button onClick={() => { setIsAdding(false); setEditingId(null); resetForm(); }} className="flex-1 md:flex-none border-2 border-border px-6 py-3 font-display uppercase tracking-widest hover:bg-muted transition-colors">CANCELAR</button>
           </div>
         </div>
       )}
@@ -344,11 +351,11 @@ function EventsTab() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-muted/50 border-b-4 border-border font-mono text-sm">
-              <th className="p-3">Date</th>
-              <th className="p-3">Title</th>
-              <th className="p-3">Venue</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Actions</th>
+              <th className="p-3">Data</th>
+              <th className="p-3">Título</th>
+              <th className="p-3">Local</th>
+              <th className="p-3">Estado</th>
+              <th className="p-3">Ações</th>
             </tr>
           </thead>
           <tbody className="font-mono text-sm">
@@ -358,7 +365,7 @@ function EventsTab() {
                 <td className="p-3 font-bold">{e.title}</td>
                 <td className="p-3">{e.venue}, {e.city}</td>
                 <td className="p-3">
-                  {e.isPast || e.forcePast ? <span className="text-foreground/50">PAST</span> : <span className="text-primary font-bold">UPCOMING</span>}
+                  {e.isPast || e.forcePast ? <span className="text-foreground/50">PASSADO</span> : <span className="text-primary font-bold">PRÓXIMO</span>}
                 </td>
                 <td className="p-3 flex gap-2">
                   <button onClick={() => { 
@@ -395,19 +402,19 @@ function EventsTab() {
               <button onClick={() => { 
                 setEditingId(e.id); 
                 setForm({ title: e.title, venue: e.venue, city: e.city, address: e.address, mapsUrl: e.mapsUrl || "", ticketUrl: e.ticketUrl || "", price: e.price || "", eventDate: e.eventDate.slice(0,16), posterUrl: e.posterUrl || "", description: e.description || "", forcePast: e.forcePast });
-              }} className="flex items-center gap-1 font-mono text-xs font-bold text-blue-600"><Edit2 size={14}/> EDIT</button>
+              }} className="flex items-center gap-1 font-mono text-xs font-bold text-blue-600"><Edit2 size={14}/> EDITAR</button>
               <button onClick={() => {
-                if (confirm("Delete this event?")) {
+                if (confirm("Eliminar este evento?")) {
                   deleteEvent.mutate({ id: e.id }, { onSuccess: () => qc.invalidateQueries({ queryKey: getListEventsQueryKey() }) });
                 }
-              }} className="flex items-center gap-1 font-mono text-xs font-bold text-red-600"><Trash2 size={14}/> DELETE</button>
+              }} className="flex items-center gap-1 font-mono text-xs font-bold text-red-600"><Trash2 size={14}/> ELIMINAR</button>
             </div>
           </div>
         ))}
       </div>
 
       {events.length === 0 && (
-        <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NO EVENTS RECORDED</div>
+        <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NENHUM EVENTO REGISTADO</div>
       )}
     </div>
   );
@@ -431,7 +438,7 @@ function BkidTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="font-display text-3xl uppercase">BK-ID Members</h2>
+      <h2 className="font-display text-3xl uppercase">Membros BK-ID</h2>
       
       {editingId && (
         <div className="border-4 border-border bg-card p-6 mb-6">
@@ -441,8 +448,8 @@ function BkidTab() {
             <input placeholder="Email" value={form.email} onChange={e=>setForm({...form, email: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
           </div>
           <div className="flex gap-4">
-            <button onClick={handleSave} className="bg-foreground text-background px-6 py-2 font-display uppercase tracking-widest hover:bg-primary transition-colors">SAVE</button>
-            <button onClick={() => setEditingId(null)} className="border-2 border-border px-6 py-2 font-display uppercase tracking-widest hover:bg-muted transition-colors">CANCEL</button>
+            <button onClick={handleSave} className="bg-foreground text-background px-6 py-2 font-display uppercase tracking-widest hover:bg-primary transition-colors">GUARDAR</button>
+            <button onClick={() => setEditingId(null)} className="border-2 border-border px-6 py-2 font-display uppercase tracking-widest hover:bg-muted transition-colors">CANCELAR</button>
           </div>
         </div>
       )}
@@ -452,11 +459,11 @@ function BkidTab() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-muted/50 border-b-4 border-border font-mono text-sm">
-              <th className="p-3">Serial</th>
-              <th className="p-3">Name</th>
+              <th className="p-3">Série</th>
+              <th className="p-3">Nome</th>
               <th className="p-3">Email</th>
-              <th className="p-3">Enlisted</th>
-              <th className="p-3">Actions</th>
+              <th className="p-3">Alistado</th>
+              <th className="p-3">Ações</th>
             </tr>
           </thead>
           <tbody className="font-mono text-sm">
@@ -498,7 +505,7 @@ function BkidTab() {
         ))}
       </div>
 
-      {members.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NO REGISTRIES</div>}
+      {members.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NENHUM REGISTO</div>}
     </div>
   );
 }
@@ -522,19 +529,19 @@ function ContentTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="font-display text-3xl uppercase">Content Blocks</h2>
+      <h2 className="font-display text-3xl uppercase">Blocos de Conteúdo</h2>
       
       <div className="space-y-6">
         {blocks.map((block) => (
           <div key={block.id} className="border-4 border-border bg-card p-6 relative">
             <div className="absolute top-0 right-0 bg-border text-background px-3 py-1 font-mono text-xs font-bold uppercase">
-              KEY: {block.key}
+              CHAVE: {block.key}
             </div>
             
             {editingKey === block.key ? (
               <div className="space-y-4 mt-6">
-                <input value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-display text-2xl bg-background" placeholder="Title" />
-                <textarea value={form.body} onChange={e=>setForm({...form, body: e.target.value})} className="w-full border-2 border-border p-2 font-mono h-32 bg-background" placeholder="Body content..." />
+                <input value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-display text-2xl bg-background" placeholder="Título" />
+                <textarea value={form.body} onChange={e=>setForm({...form, body: e.target.value})} className="w-full border-2 border-border p-2 font-mono h-32 bg-background" placeholder="Conteúdo do corpo..." />
                 <div className="flex gap-2">
                   <button onClick={() => handleSave(block.key)} className="bg-primary text-primary-foreground px-4 py-2 font-mono font-bold hover:bg-foreground"><Check size={18}/></button>
                   <button onClick={() => setEditingKey(null)} className="border-2 border-border px-4 py-2 hover:bg-muted"><X size={18}/></button>
@@ -548,7 +555,7 @@ function ContentTab() {
                   onClick={() => { setEditingKey(block.key); setForm({ title: block.title||"", body: block.body||"", imageUrl: block.imageUrl||"" }); }}
                   className="flex items-center gap-2 border-2 border-border px-4 py-2 font-mono text-sm hover:bg-muted"
                 >
-                  <Edit2 size={14}/> EDIT
+                  <Edit2 size={14}/> EDITAR
                 </button>
               </div>
             )}
@@ -580,23 +587,23 @@ function TracksTab() {
 
   return (
     <div className="space-y-6">
-      <h2 className="font-display text-3xl uppercase">Cassette Tracks</h2>
+      <h2 className="font-display text-3xl uppercase">Faixas de Cassete</h2>
       
       <form onSubmit={handleAdd} className="border-4 border-border bg-card p-4 md:p-6 flex flex-col md:flex-row gap-4 items-stretch md:items-end">
         <div className="flex-1">
-          <label className="block font-mono text-xs uppercase mb-1">Track Title</label>
+          <label className="block font-mono text-xs uppercase mb-1">Título da Faixa</label>
           <input required value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background" />
         </div>
         <div className="flex-1">
-          <label className="block font-mono text-xs uppercase mb-1">Artist</label>
+          <label className="block font-mono text-xs uppercase mb-1">Artista</label>
           <input value={form.artist} onChange={e=>setForm({...form, artist: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background" />
         </div>
         <div className="md:flex-[2]">
-          <label className="block font-mono text-xs uppercase mb-1">Audio URL (.mp3)</label>
+          <label className="block font-mono text-xs uppercase mb-1">URL de Áudio (.mp3)</label>
           <input required value={form.url} onChange={e=>setForm({...form, url: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background" />
         </div>
         <button type="submit" disabled={createTrack.isPending} className="bg-primary text-primary-foreground px-6 py-3 border-2 border-primary font-display tracking-widest uppercase hover:bg-foreground">
-          ADD
+          ADICIONAR
         </button>
       </form>
 
@@ -605,10 +612,10 @@ function TracksTab() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-muted/50 border-b-4 border-border font-mono text-sm">
-              <th className="p-3">Order</th>
-              <th className="p-3">Title</th>
-              <th className="p-3">Artist</th>
-              <th className="p-3">Actions</th>
+              <th className="p-3">Ordem</th>
+              <th className="p-3">Título</th>
+              <th className="p-3">Artista</th>
+              <th className="p-3">Ações</th>
             </tr>
           </thead>
           <tbody className="font-mono text-sm">
@@ -646,7 +653,7 @@ function TracksTab() {
         ))}
       </div>
 
-      {tracks.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NO TRACKS LOADED</div>}
+      {tracks.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/50 font-mono">NENHUMA FAIXA CARREGADA</div>}
     </div>
   );
 }
@@ -689,41 +696,42 @@ function AnnouncementsTab() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="font-display text-3xl uppercase italic">Announcements Manager</h2>
+        <h2 className="font-display text-3xl uppercase italic">Gestor de Anúncios</h2>
         <button 
           onClick={() => { setIsAdding(true); setEditingId(null); setForm({ title: "", content: "", imageUrl: "", isActive: true }); }} 
           className="flex items-center gap-2 bg-primary text-black px-4 py-2 font-mono font-bold border-2 border-primary hover:bg-white hover:border-white transition-colors"
         >
-          <Plus size={16} /> NEW ANNOUNCEMENT
+          <Plus size={16} /> NOVO ANÚNCIO
         </button>
       </div>
 
-      {(isAdding || editingId) && (
-        <div className="border-4 border-border bg-card p-6 space-y-4">
-          <h3 className="font-display text-xl uppercase italic text-primary">{editingId ? 'Edit' : 'Create'} Announcement</h3>
+      {(isAdding |        <div className="border-4 border-border bg-card p-6 space-y-4">
+          <h3 className="font-display text-xl uppercase italic text-primary">{editingId ? 'Editar' : 'Criar'} Anúncio</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="font-mono text-xs uppercase opacity-60">Title</label>
-              <input placeholder="SYSTEM UPDATE" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none" />
+              <label className="font-mono text-xs uppercase opacity-60">Título</label>
+              <input placeholder="ATUALIZAÇÃO DO SISTEMA" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none" />
             </div>
             <div className="space-y-1">
-              <label className="font-mono text-xs uppercase opacity-60">Custom Image URL (Bits)</label>
+              <label className="font-mono text-xs uppercase opacity-60">URL de Imagem Personalizada (Bits)</label>
               <input placeholder="https://..." value={form.imageUrl || ""} onChange={e=>setForm({...form, imageUrl: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none" />
             </div>
             <div className="space-y-1 md:col-span-2">
-              <label className="font-mono text-xs uppercase opacity-60">Message Content</label>
-              <textarea placeholder="Enter message here..." value={form.content} onChange={e=>setForm({...form, content: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none h-24" />
+              <label className="font-mono text-xs uppercase opacity-60">Conteúdo da Mensagem</label>
+              <textarea placeholder="Introduz a mensagem aqui..." value={form.content} onChange={e=>setForm({...form, content: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none h-24" />
             </div>
             
             <label className="flex items-center gap-2 cursor-pointer group">
               <input type="checkbox" checked={form.isActive} onChange={e=>setForm({...form, isActive: e.target.checked})} className="w-5 h-5 accent-primary" />
-              <span className="font-mono text-sm font-bold group-hover:text-primary transition-colors">Active (Show on site)</span>
+              <span className="font-mono text-sm font-bold group-hover:text-primary transition-colors">Ativo (Mostrar no site)</span>
             </label>
           </div>
           <div className="flex gap-4">
-            <button onClick={handleSave} className="bg-primary text-primary-foreground px-8 py-2 font-display uppercase tracking-widest hover:bg-foreground transition-colors">{editingId ? 'UPDATE' : 'CREATE'}</button>
-            <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="border-2 border-border px-8 py-2 font-display uppercase tracking-widest text-foreground hover:bg-muted transition-colors">CANCEL</button>
+            <button onClick={handleSave} className="bg-primary text-primary-foreground px-8 py-2 font-display uppercase tracking-widest hover:bg-foreground transition-colors">{editingId ? 'ATUALIZAR' : 'CRIAR'}</button>
+            <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="border-2 border-border px-8 py-2 font-display uppercase tracking-widest text-foreground hover:bg-muted transition-colors">CANCELAR</button>
           </div>
+        </div>
+v>
         </div>
       )}
 
@@ -753,7 +761,7 @@ function AnnouncementsTab() {
                   a.isActive ? 'bg-green-600 text-white border-green-600' : 'bg-muted border-border text-foreground/50'
                 }`}
               >
-                {a.isActive ? 'ACTIVE' : 'INACTIVE'}
+                {a.isActive ? 'ATIVO' : 'INATIVO'}
               </button>
               <button onClick={() => { if(confirm('Excluir este anúncio permanentemente?')) remove.mutate(a.id); }} className="p-2 text-red-600 hover:bg-red-600 hover:text-white border-2 border-transparent hover:border-red-600 transition-colors">
                 <Trash2 size={16} />
@@ -761,7 +769,7 @@ function AnnouncementsTab() {
             </div>
           </div>
         ))}
-        {announcements.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/20 font-mono">NO ANNOUNCEMENTS CREATED</div>}
+        {announcements.length === 0 && <div className="p-12 text-center border-4 border-border border-dashed text-foreground/20 font-mono">NENHUM ANÚNCIO CRIADO</div>}
       </div>
     </div>
   );

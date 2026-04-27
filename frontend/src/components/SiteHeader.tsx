@@ -8,8 +8,8 @@ export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
-    { href: "/", label: "HOME" },
-    { href: "/archive", label: "ARCHIVE" },
+    { href: "/", label: "INÍCIO" },
+    { href: "/archive", label: "ARQUIVO" },
     { href: "/bk-id", label: "BK-ID" },
     { href: "/admin", label: "ADMIN" },
   ];

@@ -59,17 +59,17 @@ export default function Bkid() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="pt-20 md:pt-24 pb-8 md:pb-12 px-4 md:px-8 text-center border-b-8 border-border">
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl tracking-tighter uppercase mb-4 md:mb-6">
-          [ BK-ID REGISTRY ]
+          [ REGISTO BK-ID ]
         </h1>
         <p className="font-mono text-sm sm:text-base md:text-xl font-bold max-w-2xl mx-auto mb-6 md:mb-8">
-          OFFICIAL SUPPORTER IDENTIFICATION PROGRAM.
+          PROGRAMA OFICIAL DE IDENTIFICAÇÃO DE APOIANTES.
         </p>
         
         {stats && (
           <div className="inline-flex items-center gap-2 border-4 border-primary px-6 py-2 bg-primary/10">
             <ShieldCheck className="text-primary w-6 h-6" />
             <span className="font-mono font-bold">
-              TOTAL OPERATIVES: <span className="text-primary text-xl">{stats.total}</span>
+              TOTAL DE OPERATIVOS: <span className="text-primary text-xl">{stats.total}</span>
             </span>
           </div>
         )}
@@ -81,13 +81,13 @@ export default function Bkid() {
             {/* Form */}
             <div className="border-4 border-border bg-card p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <h2 className="font-display text-3xl mb-8 uppercase border-b-4 border-border pb-4">
-                // ENLIST NOW
+                // ALISTA-TE AGORA
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block font-mono text-sm font-bold uppercase mb-2">
-                    Operative Name *
+                    Nome do Operativo *
                   </label>
                   <input
                     type="text"
@@ -96,13 +96,13 @@ export default function Bkid() {
                     value={name}
                     onChange={(e) => setName(e.target.value.toUpperCase())}
                     className="w-full bg-background border-4 border-border p-3 font-mono uppercase focus:border-primary focus:outline-none transition-colors"
-                    placeholder="ENTER DESIGNATION"
+                    placeholder="INTRODUZ A TUA DESIGNAÇÃO"
                   />
                 </div>
 
                 <div>
                   <label className="block font-mono text-sm font-bold uppercase mb-2">
-                    Contact Channel (Optional)
+                    Canal de Contacto (Opcional)
                   </label>
                   <input
                     type="email"
@@ -115,7 +115,7 @@ export default function Bkid() {
 
                 <div>
                   <label className="block font-mono text-sm font-bold uppercase mb-2">
-                    Biometric Scan (Photo)
+                    Scan Biométrico (Foto)
                   </label>
                   <div className="border-4 border-dashed border-border p-6 text-center relative hover:bg-muted/50 transition-colors">
                     <input
@@ -127,7 +127,7 @@ export default function Bkid() {
                     <div className="flex flex-col items-center gap-2 pointer-events-none">
                       <Upload className="w-8 h-8 text-foreground/50" />
                       <span className="font-mono text-sm">
-                        {photoUrl ? "SCAN ACQUIRED. CLICK TO REPLACE." : "CLICK TO UPLOAD SCAN"}
+                        {photoUrl ? "SCAN ADQUIRIDO. CLICA PARA SUBSTITUIR." : "CLICA PARA FAZER UPLOAD DO SCAN"}
                       </span>
                     </div>
                   </div>
@@ -139,7 +139,7 @@ export default function Bkid() {
                     disabled={!name.trim() || createMember.isPending}
                     className="w-full py-4 bg-primary text-primary-foreground font-display text-2xl tracking-widest uppercase hover:bg-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                   >
-                    {createMember.isPending ? "GENERATING..." : "GENERATE ID"}
+                    {createMember.isPending ? "A GERAR..." : "GERAR ID"}
                   </button>
                 </div>
               </form>
@@ -150,12 +150,12 @@ export default function Bkid() {
               <div className="bg-yellow-500/20 border-4 border-yellow-500 p-6 text-yellow-800 dark:text-yellow-500 flex gap-4">
                 <AlertTriangle className="shrink-0 w-8 h-8" />
                 <div className="font-mono text-sm leading-relaxed font-bold uppercase">
-                  WARNING: THIS IS A PERMANENT REGISTRY. YOUR DATA WILL BE SECURELY HASHED. THE GENERATED ID CARD CAN BE DOWNLOADED AND USED FOR FUTURE OFFLINE RIOTS.
+                  AVISO: ESTE É UM REGISTO PERMANENTE. OS TEUS DADOS SERÃO ENCRIPTADOS. O CARTÃO ID GERADO PODE SER DESCARREGADO E USADO EM FUTUROS DISTÚRBIOS OFFLINE.
                 </div>
               </div>
               
               <div className="border-4 border-border p-4 md:p-6 bg-muted/30 overflow-hidden">
-                <h3 className="font-display text-xl mb-4">PREVIEW</h3>
+                <h3 className="font-display text-xl mb-4">PRÉ-VISUALIZAÇÃO</h3>
                 <div className="flex justify-center md:justify-start">
                   <div className="scale-[0.6] sm:scale-[0.8] md:scale-75 origin-top-left">
                     <IdCard name={name || "SUBJECT_NAME"} serial="BK-XXXXX" photoUrl={photoUrl} />
@@ -167,9 +167,9 @@ export default function Bkid() {
         ) : (
           <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
             <div className="mb-8 md:mb-12 text-center">
-              <h2 className="font-display text-3xl md:text-4xl text-primary mb-2 md:mb-4">REGISTRY CONFIRMED</h2>
+              <h2 className="font-display text-3xl md:text-4xl text-primary mb-2 md:mb-4">REGISTO CONFIRMADO</h2>
               <p className="font-mono font-bold text-base md:text-xl uppercase px-4">
-                Welcome to the riot, operative {generatedCard.name}.
+                Bem-vindo ao distúrbio, operativo {generatedCard.name}.
               </p>
             </div>
             
@@ -190,7 +190,7 @@ export default function Bkid() {
                 className="py-4 md:py-3 px-8 bg-primary text-primary-foreground font-display text-xl tracking-widest uppercase hover:bg-foreground transition-colors flex items-center justify-center gap-2 border-4 border-primary hover:border-foreground w-full sm:w-auto"
               >
                 <Download className="w-5 h-5" />
-                DOWNLOAD ID CARD
+                DESCARREGAR CARTÃO ID
               </button>
               
               <button
@@ -202,7 +202,7 @@ export default function Bkid() {
                 }}
                 className="py-4 md:py-3 px-8 bg-card text-foreground font-display text-xl tracking-widest uppercase hover:bg-muted transition-colors border-4 border-border w-full sm:w-auto text-center"
               >
-                BACK
+                VOLTAR
               </button>
             </div>
           </div>

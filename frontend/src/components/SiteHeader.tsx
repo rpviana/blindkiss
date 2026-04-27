@@ -19,7 +19,7 @@ export function SiteHeader() {
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
           <img src={logoUrl} alt="Blindkiss Logo" className="h-8 w-auto object-contain" />
-          <span className="font-display text-xl tracking-widest text-primary hidden sm:inline-block">
+          <span className="font-display text-xl tracking-widest text-primary inline-block">
             BLINDKISS
           </span>
         </Link>

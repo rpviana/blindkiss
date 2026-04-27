@@ -705,7 +705,8 @@ function AnnouncementsTab() {
         </button>
       </div>
 
-      {(isAdding |        <div className="border-4 border-border bg-card p-6 space-y-4">
+      {(isAdding || editingId) && (
+        <div className="border-4 border-border bg-card p-6 space-y-4">
           <h3 className="font-display text-xl uppercase italic text-primary">{editingId ? 'Editar' : 'Criar'} Anúncio</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -730,8 +731,6 @@ function AnnouncementsTab() {
             <button onClick={handleSave} className="bg-primary text-primary-foreground px-8 py-2 font-display uppercase tracking-widest hover:bg-foreground transition-colors">{editingId ? 'ATUALIZAR' : 'CRIAR'}</button>
             <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="border-2 border-border px-8 py-2 font-display uppercase tracking-widest text-foreground hover:bg-muted transition-colors">CANCELAR</button>
           </div>
-        </div>
-v>
         </div>
       )}
 

@@ -33,6 +33,7 @@ import {
 
 import { LogOut, Plus, Trash2, Edit2, Check, X, Zap } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 export default function Admin() {
   const qc = useQueryClient();
@@ -61,7 +62,11 @@ export default function Admin() {
             onSubmit={(e) => {
               e.preventDefault();
               login.mutate({ data: { username, password } }, {
-                onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() })
+                onSuccess: () => {
+                  qc.invalidateQueries({ queryKey: getAdminMeQueryKey() });
+                  toast.success("Bem-vindo.");
+                },
+                onError: () => toast.error("Credenciais inválidas.")
               });
             }} 
             className="space-y-6"
@@ -102,7 +107,10 @@ export default function Admin() {
       <header className="border-b-4 border-border bg-card px-4 md:px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <h1 className="font-display text-xl md:text-2xl tracking-widest text-primary truncate mr-4">CONSOLA DE ADMIN</h1>
         <button 
-          onClick={() => logout.mutate(undefined, { onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() }) })}
+          onClick={() => logout.mutate(undefined, { 
+            onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() }),
+            onError: () => toast.error("Erro ao sair.")
+          })}
           className="flex items-center gap-2 font-mono text-xs md:text-sm font-bold hover:text-primary transition-colors shrink-0"
         >
           <LogOut size={16} /> SAIR
@@ -170,8 +178,9 @@ function SettingsTab() {
     updateSettings.mutate({ data: form }, {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getGetSiteSettingsQueryKey() });
-        alert("Settings updated!");
-      }
+        toast.success("Definições atualizadas!");
+      },
+      onError: () => toast.error("Erro ao atualizar definições.")
     });
   };
 
@@ -294,7 +303,9 @@ function EventsTab() {
           qc.invalidateQueries({ queryKey: getListEventsQueryKey() });
           setEditingId(null);
           resetForm();
-        }
+          toast.success("Evento atualizado!");
+        },
+        onError: () => toast.error("Erro ao atualizar.")
       });
     } else {
       createEvent.mutate({ data: payload }, {
@@ -302,7 +313,9 @@ function EventsTab() {
           qc.invalidateQueries({ queryKey: getListEventsQueryKey() });
           setIsAdding(false);
           resetForm();
-        }
+          toast.success("Evento criado!");
+        },
+        onError: () => toast.error("Erro ao criar.")
       });
     }
   };
@@ -371,7 +384,13 @@ function EventsTab() {
                   }} className="text-blue-600 hover:text-blue-800"><Edit2 size={18}/></button>
                   <button onClick={() => {
                     if (confirm("Delete this event?")) {
-                      deleteEvent.mutate({ id: e.id }, { onSuccess: () => qc.invalidateQueries({ queryKey: getListEventsQueryKey() }) });
+                      deleteEvent.mutate({ id: e.id }, { 
+                        onSuccess: () => {
+                          qc.invalidateQueries({ queryKey: getListEventsQueryKey() });
+                          toast.success("Evento eliminado.");
+                        },
+                        onError: () => toast.error("Erro ao eliminar.")
+                      });
                     }
                   }} className="text-red-600 hover:text-red-800"><Trash2 size={18}/></button>
                 </td>
@@ -402,7 +421,13 @@ function EventsTab() {
               }} className="flex items-center gap-1 font-mono text-xs font-bold text-blue-600"><Edit2 size={14}/> EDITAR</button>
               <button onClick={() => {
                 if (confirm("Eliminar este evento?")) {
-                  deleteEvent.mutate({ id: e.id }, { onSuccess: () => qc.invalidateQueries({ queryKey: getListEventsQueryKey() }) });
+                  deleteEvent.mutate({ id: e.id }, { 
+                    onSuccess: () => {
+                      qc.invalidateQueries({ queryKey: getListEventsQueryKey() });
+                      toast.success("Evento eliminado.");
+                    },
+                    onError: () => toast.error("Erro ao eliminar.")
+                  });
                 }
               }} className="flex items-center gap-1 font-mono text-xs font-bold text-red-600"><Trash2 size={14}/> ELIMINAR</button>
             </div>
@@ -429,7 +454,12 @@ function BkidTab() {
   const handleSave = () => {
     if (!editingId) return;
     updateMember.mutate({ id: editingId, data: form }, {
-      onSuccess: () => setEditingId(null)
+      onSuccess: () => {
+        setEditingId(null);
+        toast.success("Membro atualizado.");
+        qc.invalidateQueries({ queryKey: ["bkid-members"] });
+      },
+      onError: () => toast.error("Erro ao atualizar.")
     });
   };
 
@@ -473,7 +503,13 @@ function BkidTab() {
                 <td className="p-3 flex gap-2">
                   <button onClick={() => { setEditingId(m.id); setForm({ name: m.name, email: m.email || "" }); }} className="text-blue-600 hover:text-blue-800"><Edit2 size={18}/></button>
                   <button onClick={() => {
-                    if (confirm(`Delete member ${m.name}?`)) deleteMember.mutate(m.id);
+                    if (confirm(`Delete member ${m.name}?`)) deleteMember.mutate(m.id, {
+                      onSuccess: () => {
+                        toast.success("Membro eliminado.");
+                        qc.invalidateQueries({ queryKey: ["bkid-members"] });
+                      },
+                      onError: () => toast.error("Erro ao eliminar.")
+                    });
                   }} className="text-red-600 hover:text-red-800"><Trash2 size={18}/></button>
                 </td>
               </tr>
@@ -491,7 +527,13 @@ function BkidTab() {
               <div className="flex gap-2">
                 <button onClick={() => { setEditingId(m.id); setForm({ name: m.name, email: m.email || "" }); }} className="text-blue-600"><Edit2 size={18}/></button>
                 <button onClick={() => {
-                  if (confirm(`Delete member ${m.name}?`)) deleteMember.mutate(m.id);
+                  if (confirm(`Delete member ${m.name}?`)) deleteMember.mutate(m.id, {
+                    onSuccess: () => {
+                      toast.success("Membro eliminado.");
+                      qc.invalidateQueries({ queryKey: ["bkid-members"] });
+                    },
+                    onError: () => toast.error("Erro ao eliminar.")
+                  });
                 }} className="text-red-600"><Trash2 size={18}/></button>
               </div>
             </div>
@@ -520,7 +562,9 @@ function ContentTab() {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getListContentBlocksQueryKey() });
         setEditingKey(null);
-      }
+        toast.success("Bloco atualizado.");
+      },
+      onError: () => toast.error("Erro ao atualizar bloco.")
     });
   };
 
@@ -623,7 +667,15 @@ function TracksTab() {
                 <td className="p-3">{t.artist}</td>
                 <td className="p-3">
                   <button onClick={() => {
-                    if(confirm("Delete track?")) deleteTrack.mutate({ id: t.id }, { onSuccess: () => qc.invalidateQueries({ queryKey: getListTracksQueryKey() }) });
+                    if(confirm("Eliminar esta faixa?")) {
+                      deleteTrack.mutate({ id: t.id }, { 
+                        onSuccess: () => {
+                          toast.success("Faixa eliminada.");
+                          qc.invalidateQueries({ queryKey: getListTracksQueryKey() });
+                        },
+                        onError: () => toast.error("Erro ao eliminar faixa.")
+                      });
+                    }
                   }} className="text-red-600 hover:text-red-800"><Trash2 size={18}/></button>
                 </td>
               </tr>
@@ -644,7 +696,15 @@ function TracksTab() {
               </div>
             </div>
             <button onClick={() => {
-              if(confirm("Delete track?")) deleteTrack.mutate({ id: t.id }, { onSuccess: () => qc.invalidateQueries({ queryKey: getListTracksQueryKey() }) });
+              if(confirm("Eliminar esta faixa?")) {
+                deleteTrack.mutate({ id: t.id }, { 
+                  onSuccess: () => {
+                    toast.success("Faixa eliminada.");
+                    qc.invalidateQueries({ queryKey: getListTracksQueryKey() });
+                  },
+                  onError: () => toast.error("Erro ao eliminar faixa.")
+                });
+              }
             }} className="text-red-600 p-2"><Trash2 size={20}/></button>
           </div>
         ))}
@@ -668,19 +728,28 @@ function AnnouncementsTab() {
   });
 
   const handleSave = () => {
+    if (!form.title || !form.content) {
+      toast.error("Título e conteúdo são obrigatórios.");
+      return;
+    }
+
     if (editingId) {
       update.mutate({ id: editingId, data: form }, {
         onSuccess: () => {
+          toast.success("Anúncio atualizado!");
           setEditingId(null);
           setForm({ title: "", content: "", imageUrl: "", isActive: true });
-        }
+        },
+        onError: () => toast.error("Erro ao atualizar anúncio.")
       });
     } else {
       create.mutate(form, {
         onSuccess: () => {
+          toast.success("Anúncio criado!");
           setIsAdding(false);
           setForm({ title: "", content: "", imageUrl: "", isActive: true });
-        }
+        },
+        onError: () => toast.error("Erro ao criar anúncio.")
       });
     }
   };
@@ -752,14 +821,24 @@ function AnnouncementsTab() {
                 <Edit2 size={16} />
               </button>
               <button 
-                onClick={() => update.mutate({ id: a.id, data: { isActive: !a.isActive } })}
+                onClick={() => update.mutate({ id: a.id, data: { isActive: !a.isActive } }, {
+                  onSuccess: () => toast.success(a.isActive ? "Anúncio desativado." : "Anúncio ativado."),
+                  onError: () => toast.error("Erro ao alterar estado.")
+                })}
                 className={`px-3 py-1 font-mono text-[10px] font-bold border-2 transition-colors ${
                   a.isActive ? 'bg-green-600 text-white border-green-600' : 'bg-muted border-border text-foreground/50'
                 }`}
               >
                 {a.isActive ? 'ATIVO' : 'INATIVO'}
               </button>
-              <button onClick={() => { if(confirm('Excluir este anúncio permanentemente?')) remove.mutate(a.id); }} className="p-2 text-red-600 hover:bg-red-600 hover:text-white border-2 border-transparent hover:border-red-600 transition-colors">
+              <button onClick={() => { 
+                if(confirm('Excluir este anúncio permanentemente?')) {
+                  remove.mutate(a.id, {
+                    onSuccess: () => toast.success("Anúncio eliminado."),
+                    onError: () => toast.error("Erro ao eliminar anúncio.")
+                  });
+                }
+              }} className="p-2 text-red-600 hover:bg-red-600 hover:text-white border-2 border-transparent hover:border-red-600 transition-colors">
                 <Trash2 size={16} />
               </button>
             </div>

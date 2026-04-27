@@ -1005,8 +1005,8 @@ function AnnouncementsTab() {
 
       <div className="space-y-4">
         {announcements.map((a) => (
-          <div key={a.id} className={`border-4 border-border p-4 bg-card flex justify-between items-center transition-all ${!a.isActive ? 'opacity-40 grayscale' : 'hover:border-primary'}`}>
-            <div className="flex items-center gap-4">
+          <div key={a.id} className={`border-4 border-border p-4 bg-card flex flex-col md:flex-row md:justify-between md:items-center gap-3 transition-all overflow-hidden ${!a.isActive ? 'opacity-40 grayscale' : 'hover:border-primary'}`}>
+            <div className="flex items-center gap-4 min-w-0">
               <div className="w-12 h-12 border-2 border-border bg-muted overflow-hidden flex-shrink-0">
                 {a.imageUrl ? (
                   <img src={a.imageUrl} alt="" className="w-full h-full object-cover" />
@@ -1014,12 +1014,12 @@ function AnnouncementsTab() {
                   <Zap size={20} className="m-auto mt-3 text-foreground/20" />
                 )}
               </div>
-              <div>
+              <div className="min-w-0">
                 <h4 className="font-display text-lg uppercase leading-tight italic">{a.title}</h4>
-                <p className="font-mono text-[10px] opacity-60 truncate max-w-[200px] md:max-w-md">{a.content}</p>
+                <p className="font-mono text-[10px] opacity-60 truncate max-w-full md:max-w-md">{a.content}</p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap md:flex-nowrap">
               <button onClick={() => startEdit(a)} className="p-2 border-2 border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors">
                 <Edit2 size={16} />
               </button>

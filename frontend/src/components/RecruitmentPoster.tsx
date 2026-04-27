@@ -25,7 +25,7 @@ export function RecruitmentPoster() {
 
   return (
     <>
-      <div className="max-w-2xl mx-auto bg-[#eaddce] border-[12px] border-[#222] p-8 md:p-12 pb-24 md:pb-12 relative shadow-2xl overflow-hidden before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] before:opacity-50 before:pointer-events-none">
+      <div className="max-w-2xl mx-auto bg-[#eaddce] border-[12px] border-[#222] p-8 md:p-12 pb-24 md:pb-12 relative shadow-2xl overflow-hidden isolate before:absolute before:inset-0 before:bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] before:opacity-50 before:pointer-events-none">
         <div className="absolute inset-0 opacity-[0.05] bg-black/10 mix-blend-multiply pointer-events-none"></div>
 
         <div className="relative z-10 flex flex-col items-center text-center">
@@ -89,8 +89,8 @@ export function RecruitmentPoster() {
       </div>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/70 p-4 flex items-center justify-center">
-          <div className="w-full max-w-xl border-4 border-border bg-card p-6 md:p-8 relative">
+        <div className="fixed inset-0 z-[200] bg-black/70 p-4 flex items-center justify-center overflow-y-auto">
+          <div className="w-full max-w-xl border-4 border-border bg-card p-6 md:p-8 relative my-8">
             <button
               type="button"
               onClick={() => setIsOpen(false)}

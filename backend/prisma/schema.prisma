@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model admins {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique(map: "admins_username_unique")
+  password_hash String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model bkid_members {
+  id         Int      @id @default(autoincrement())
+  serial     String   @unique(map: "bkid_members_serial_unique")
+  name       String
+  email      String?
+  photo_url  String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model content_blocks {
+  id         Int      @id @default(autoincrement())
+  key        String   @unique(map: "content_blocks_key_unique")
+  title      String?
+  body       String?
+  image_url  String?
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model events {
+  id          Int      @id @default(autoincrement())
+  title       String
+  venue       String
+  city        String
+  address     String
+  maps_url    String?
+  ticket_url  String?
+  price       String?
+  event_date  DateTime @db.Timestamptz(6)
+  poster_url  String?
+  description String?
+  force_past  Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model site_settings {
+  id                   Int      @id @default(autoincrement())
+  color_background     String   @default("#dddad3")
+  color_title          String   @default("#910802")
+  color_text           String   @default("#7d7573")
+  color_accent         String   @default("#910802")
+  glitch_mode          Boolean  @default(false)
+  recruitment_title    String   @default("WANTED")
+  recruitment_subtitle String   @default("blindkiss procura novos membros")
+  recruitment_bassist  String   @default("BAIXISTA — disponibilidade para ensaios semanais e concertos no Porto.")
+  recruitment_drummer  String   @default("BATERISTA — atitude crua, gosto pelo barulho, presença em palco.")
+  recruitment_contact  String   @default("contacto@blindkiss.pt")
+  hero_tagline         String   @default("RUÍDO COM BEIJOS // PORTO")
+  footer_coords        String   @default("41.1496° N, 8.6109° W")
+  footer_city          String   @default("PORTO — PT")
+  updated_at           DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model tracks {
+  id           Int      @id @default(autoincrement())
+  title        String
+  artist       String?
+  url          String
+  duration_sec Int?
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model announcements {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  image_url  String?
+  type       String   @default("glitch")
+  is_active  Boolean  @default(true)
+  show_popup Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useGetSiteSettings, useSubmitRecruitmentApplication } from "@/api-client";
 import { toast } from "sonner";
 
@@ -20,6 +21,15 @@ export function RecruitmentPoster() {
     if (!trimmed) return trimmed;
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = overflow;
+    };
+  }, [isOpen]);
 
   if (!settings || !settings.showRecruitment) return null;
 
@@ -88,7 +98,7 @@ export function RecruitmentPoster() {
         </div>
       </div>
 
-      {isOpen && (
+      {isOpen && typeof document !== "undefined" && createPortal(
         <div className="fixed inset-0 z-[200] bg-black/70 p-4 flex items-center justify-center overflow-y-auto">
           <div className="w-full max-w-xl border-4 border-border bg-card p-6 md:p-8 relative my-8">
             <button
@@ -181,7 +191,8 @@ export function RecruitmentPoster() {
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );

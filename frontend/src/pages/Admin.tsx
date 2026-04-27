@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { 
   useAdminMe, 
@@ -165,8 +165,14 @@ function SettingsTab() {
   const updateSettings = useUpdateSiteSettings();
 
   const [form, setForm] = useState(settings || {} as any);
+ 
+  useEffect(() => {
+    if (settings) {
+      setForm(settings);
+    }
+  }, [settings]);
 
-  if (!settings) return <div>Loading...</div>;
+  if (!settings) return <div className="p-8 font-mono text-foreground/50">A CARREGAR DEFINIÇÕES...</div>;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;

@@ -199,65 +199,65 @@ function SettingsTab() {
             </div>
             <div className="flex items-center gap-4">
               <input type="color" name="colorTitle" value={form.colorTitle} onChange={handleChange} className="w-12 h-12" />
-              <label className="font-mono text-sm">Titles / Primary</label>
+              <label className="font-mono text-sm">Títulos / Primário</label>
             </div>
             <div className="flex items-center gap-4">
               <input type="color" name="colorText" value={form.colorText} onChange={handleChange} className="w-12 h-12" />
-              <label className="font-mono text-sm">Text / Foreground</label>
+              <label className="font-mono text-sm">Texto / Principal</label>
             </div>
             <div className="flex items-center gap-4">
               <input type="color" name="colorAccent" value={form.colorAccent} onChange={handleChange} className="w-12 h-12" />
-              <label className="font-mono text-sm">Accent</label>
+              <label className="font-mono text-sm">Destaque</label>
             </div>
           </div>
 
           <div className="space-y-4 border-2 border-dashed border-border p-4">
-            <h3 className="font-mono font-bold uppercase text-primary">Effects</h3>
+            <h3 className="font-mono font-bold uppercase text-primary">Efeitos</h3>
             <label className="flex items-center gap-4 cursor-pointer">
               <input type="checkbox" name="glitchMode" checked={form.glitchMode} onChange={handleChange} className="w-6 h-6 accent-primary" />
-              <span className="font-mono font-bold">Enable Glitch Mode</span>
+              <span className="font-mono font-bold">Ativar Modo Glitch</span>
             </label>
           </div>
         </div>
 
         <div className="space-y-4 border-2 border-dashed border-border p-4">
-          <h3 className="font-mono font-bold uppercase text-primary">Text Content</h3>
+          <h3 className="font-mono font-bold uppercase text-primary">Conteúdo de Texto</h3>
           
           <div>
-            <label className="block font-mono text-sm mb-1">Hero Tagline</label>
+            <label className="block font-mono text-sm mb-1">Slogan Principal (Hero)</label>
             <input type="text" name="heroTagline" value={form.heroTagline} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block font-mono text-sm mb-1">Recruitment Title</label>
+              <label className="block font-mono text-sm mb-1">Título de Recrutamento</label>
               <input type="text" name="recruitmentTitle" value={form.recruitmentTitle} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
-              <label className="block font-mono text-sm mb-1">Recruitment Subtitle</label>
+              <label className="block font-mono text-sm mb-1">Subtítulo de Recrutamento</label>
               <input type="text" name="recruitmentSubtitle" value={form.recruitmentSubtitle} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
-              <label className="block font-mono text-sm mb-1">Recruitment Bassist</label>
+              <label className="block font-mono text-sm mb-1">Recrutamento: Baixista</label>
               <input type="text" name="recruitmentBassist" value={form.recruitmentBassist} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
-              <label className="block font-mono text-sm mb-1">Recruitment Drummer</label>
+              <label className="block font-mono text-sm mb-1">Recrutamento: Baterista</label>
               <input type="text" name="recruitmentDrummer" value={form.recruitmentDrummer} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div className="md:col-span-2">
-              <label className="block font-mono text-sm mb-1">Recruitment Contact</label>
+              <label className="block font-mono text-sm mb-1">Contacto de Recrutamento</label>
               <input type="text" name="recruitmentContact" value={form.recruitmentContact} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block font-mono text-sm mb-1">Footer City</label>
+              <label className="block font-mono text-sm mb-1">Cidade (Rodapé)</label>
               <input type="text" name="footerCity" value={form.footerCity} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
-              <label className="block font-mono text-sm mb-1">Footer Coordinates</label>
+              <label className="block font-mono text-sm mb-1">Coordenadas (Rodapé)</label>
               <input type="text" name="footerCoords" value={form.footerCoords} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
           </div>

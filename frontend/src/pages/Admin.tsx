@@ -1712,7 +1712,7 @@ function TeamTab() {
     }
 
     createMember.mutate(
-      { data: payload },
+      payload,
       {
         onSuccess: () => {
           toast.success("Membro criado.");

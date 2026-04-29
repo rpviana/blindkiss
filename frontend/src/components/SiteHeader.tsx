@@ -11,12 +11,11 @@ export function SiteHeader() {
   const { data: settings } = useGetSiteSettings();
   const headerLogoSrc = settings?.logoUrl || logoUrl;
 
-  const links = [
+  const mainLinks = [
     { href: "/", label: "INÍCIO" },
-    { href: "/team", label: "EQUIPA" },
     { href: "/archive", label: "ARQUIVO" },
     { href: "/bk-id", label: "BK-ID" },
-    { href: "/admin", label: "ADMIN" },
+    { href: "/team", label: "EQUIPA" },
   ];
 
   return (
@@ -28,8 +27,8 @@ export function SiteHeader() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          {links.map((link) => (
+        <nav className="hidden md:flex items-center gap-6 ml-auto">
+          {mainLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -55,7 +54,7 @@ export function SiteHeader() {
       {isOpen && (
         <div className="md:hidden border-b-2 border-border bg-background">
           <nav className="flex flex-col items-center py-4 gap-4">
-            {links.map((link) => (
+            {mainLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

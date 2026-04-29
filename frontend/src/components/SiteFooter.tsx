@@ -20,6 +20,13 @@ export function SiteFooter() {
         <Link href="/vault" className="font-mono text-xs text-primary/80 hover:text-primary uppercase tracking-wider">
           [ vault_access ]
         </Link>
+
+        <Link
+          href="/admin"
+          className="font-mono text-xs text-foreground/35 hover:text-foreground/70 uppercase tracking-wider"
+        >
+          [ admin ]
+        </Link>
         
         <div className="text-xs font-mono text-foreground/50 uppercase mt-8">
           RUÍDO COM BEIJOS. TODOS OS DIREITOS RESERVADOS.

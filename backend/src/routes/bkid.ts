@@ -27,6 +27,38 @@ function normalizeName(name: string): string {
     .toUpperCase();
 }
 
+/**
+ * Calculates Levenshtein distance between two strings
+ * Used to find similar names even if they have typos
+ */
+function levenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+
+  return matrix[b.length][a.length];
+}
+
 function serialize(row: {
   id: number;
   serial: string;
@@ -123,6 +155,8 @@ router.get("/bkid/stats", async (_req, res) => {
 router.post("/bkid/recover", async (req, res) => {
   const body = RecoverBkidBody.parse(req.body);
   const normalizedName = normalizeName(body.name);
+
+  // First, find all members with the EXACT email
   const emailCandidates = await prisma.bkid_members.findMany({
     where: {
       email: {
@@ -133,35 +167,36 @@ router.post("/bkid/recover", async (req, res) => {
     orderBy: [{ id: "desc" }],
   });
 
-  if (emailCandidates.length > 0) {
-    const exactByNameAndEmail = emailCandidates.find(
-      (item) => normalizeName(item.name) === normalizedName,
-    );
-    const member = exactByNameAndEmail ?? emailCandidates[0];
-    res.json(serialize(member));
+  if (emailCandidates.length === 0) {
+    // Email not found in the system
+    res.status(404).json({ ok: false, message: "Email not found in BK-ID system" });
     return;
   }
 
-  // Legacy fallback for rows with bad/empty email: recover by normalized name only.
-  const nameCandidates = await prisma.bkid_members.findMany({
-    where: {
-      name: {
-        contains: body.name.trim(),
-        mode: "insensitive",
-      },
-    },
-    orderBy: [{ id: "desc" }],
-    take: 20,
+  // Email was found, now find the best name match among candidates
+  let bestMatch = emailCandidates[0];
+  let bestDistance = levenshteinDistance(normalizedName, normalizeName(bestMatch.name));
+
+  for (const candidate of emailCandidates) {
+    const distance = levenshteinDistance(normalizedName, normalizeName(candidate.name));
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestMatch = candidate;
+    }
+  }
+
+  // Only return a match if the name distance is reasonable (max 3 character differences)
+  // Otherwise, the user likely has the wrong email or name
+  if (bestDistance <= 3) {
+    res.json(serialize(bestMatch));
+    return;
+  }
+
+  // Name doesn't match well enough
+  res.status(404).json({ 
+    ok: false, 
+    message: "No BK-ID found with this email and name combination. Please verify your information." 
   });
-  const exactByName = nameCandidates.find(
-    (item) => normalizeName(item.name) === normalizedName,
-  );
-
-  if (!exactByName) {
-    res.status(404).json({ ok: false });
-    return;
-  }
-  res.json(serialize(exactByName));
 });
 
 router.patch("/bkid/:id", requireAdmin, async (req, res) => {

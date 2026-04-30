@@ -29,7 +29,7 @@ async function getOrCreatePressKit() {
 
 function serialize(row: any) {
   const photoUrls = Array.isArray(row.photo_urls)
-    ? row.photo_urls.filter((item): item is string => typeof item === "string")
+    ? row.photo_urls.filter((item: unknown): item is string => typeof item === "string")
     : [];
 
   return {

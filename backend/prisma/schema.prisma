@@ -131,15 +131,20 @@ model vault_assets {
   created_at  DateTime @default(now()) @db.Timestamptz(6)
 }
 
+enum TeamMemberGroup {
+  band
+  contributor
+}
+
 model team_members {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.Text
-  role       Json     @db.JsonB
-  codename   String   @db.Text
-  age        Int
-  bio        Json?    @db.JsonB
-  photo_url  String?  @db.Text
-  sort_order Int      @default(0)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id           Int               @id @default(autoincrement())
+  name         String            @db.Text
+  role         Json              @db.JsonB
+  codename     String            @db.Text
+  age          Int
+  bio          Json?             @db.JsonB
+  photo_url    String?           @db.Text
+  member_group TeamMemberGroup   @default(contributor)
+  created_at   DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime          @default(now()) @db.Timestamptz(6)
 }

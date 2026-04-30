@@ -58,6 +58,7 @@ import {
 import { LogOut, Plus, Trash2, Edit2, Check, X, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useLanguage } from "@/lib/i18n";
 
 type AdminTab =
   | "settings"
@@ -73,6 +74,7 @@ type AdminTab =
 
 export default function Admin() {
   const qc = useQueryClient();
+  const { language: editLang } = useLanguage();
   const { data: admin, isLoading: adminLoading } = useAdminMe();
   const login = useAdminLogin();
   const logout = useAdminLogout();
@@ -80,7 +82,6 @@ export default function Admin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState<AdminTab>("settings");
-  const [editLang, setEditLang] = useState<"pt" | "en">("pt");
   const tabs: Array<{ id: AdminTab; label: string }> = [
     { id: "settings", label: "definições" },
     { id: "events", label: "eventos" },
@@ -152,24 +153,11 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="border-b-4 border-border bg-card px-4 md:px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <div className="flex flex-col bg-background">
+      {/* top-16: fica imediatamente abaixo do SiteHeader (h-16) para ambos ficarem sticky ao rolar a página */}
+      <header className="sticky top-16 z-40 border-b-4 border-border bg-card px-4 md:px-6 py-4 flex justify-between items-center">
         <h1 className="font-display text-xl md:text-2xl tracking-widest text-primary truncate mr-4">CONSOLA DE ADMIN</h1>
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex border-2 border-border p-1 bg-background">
-            <button 
-              onClick={() => setEditLang("pt")} 
-              className={`px-3 py-1 font-mono text-sm uppercase transition-colors ${editLang === "pt" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}
-            >
-              PT
-            </button>
-            <button 
-              onClick={() => setEditLang("en")} 
-              className={`px-3 py-1 font-mono text-sm uppercase transition-colors ${editLang === "en" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}
-            >
-              EN
-            </button>
-          </div>
           <button 
             onClick={() => logout.mutate(undefined, { 
               onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() }),
@@ -182,9 +170,9 @@ export default function Admin() {
         </div>
       </header>
 
-      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row">
         {/* Sidebar / Navigation */}
-        <aside className="w-full md:w-64 border-b-4 md:border-b-0 md:border-r-4 border-border bg-muted/20 flex md:flex-col p-2 md:p-4 gap-2 overflow-x-auto md:overflow-x-visible no-scrollbar">
+        <aside className="w-full md:w-64 shrink-0 border-b-4 md:border-b-0 md:border-r-4 border-border bg-muted/20 flex md:flex-col p-2 md:p-4 gap-2 overflow-x-auto md:overflow-x-visible no-scrollbar">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -200,14 +188,9 @@ export default function Admin() {
           ))}
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto p-4 md:p-8 bg-background">
+        {/* Main Content — scroll na página inteira para o SiteHeader (sticky) acompanhar */}
+        <main className="flex-1 p-4 md:p-8 bg-background min-w-0">
           <div className="max-w-5xl mx-auto">
-            {/* Mobile language toggle inside main content */}
-            <div className="md:hidden flex border-2 border-border p-1 bg-card mb-4">
-              <button onClick={() => setEditLang("pt")} className={`flex-1 py-2 font-mono text-sm uppercase transition-colors ${editLang === "pt" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}>PT</button>
-              <button onClick={() => setEditLang("en")} className={`flex-1 py-2 font-mono text-sm uppercase transition-colors ${editLang === "en" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}>EN</button>
-            </div>
             {activeTab === "settings" && <SettingsTab editLang={editLang} />}
             {activeTab === "events" && <EventsTab editLang={editLang} />}
             {activeTab === "bkid" && <BkidTab />}
@@ -1609,7 +1592,7 @@ function TeamTab({ editLang }: { editLang: "pt" | "en" }) {
     age: 17,
     bio: { pt: "", en: "" } as any,
     photoUrl: "",
-    sortOrder: 0,
+    memberGroup: "contributor" as "band" | "contributor",
   };
 
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -1772,7 +1755,7 @@ function TeamTab({ editLang }: { editLang: "pt" | "en" }) {
       age: member.age,
       bio: member.bio as any || { pt: "", en: "" },
       photoUrl: member.photoUrl || "",
-      sortOrder: member.sortOrder,
+      memberGroup: member.memberGroup,
     });
     setSourceMode(member.photoUrl ? "url" : "file");
     setSelectedFileName("");
@@ -1781,9 +1764,13 @@ function TeamTab({ editLang }: { editLang: "pt" | "en" }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
-      ...form,
-      bio: form.bio.trim() || null,
+      name: form.name,
+      role: form.role,
+      codename: form.codename,
+      age: form.age,
+      bio: form.bio,
       photoUrl: form.photoUrl.trim() || null,
+      memberGroup: form.memberGroup,
     };
 
     if (editingId) {
@@ -1873,14 +1860,17 @@ function TeamTab({ editLang }: { editLang: "pt" | "en" }) {
             />
           </div>
           <div>
-            <label className="block font-mono text-xs uppercase mb-1">Ordem</label>
-            <input
-              type="number"
-              value={form.sortOrder}
-              onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
-              className="w-full border-2 border-border bg-background p-2 font-mono"
-              placeholder="1"
-            />
+            <label className="block font-mono text-xs uppercase mb-1">Lista</label>
+            <select
+              value={form.memberGroup}
+              onChange={(e) =>
+                setForm({ ...form, memberGroup: e.target.value as "band" | "contributor" })
+              }
+              className="w-full border-2 border-border bg-background p-2 font-mono uppercase"
+            >
+              <option value="band">Banda</option>
+              <option value="contributor">Contribuidor</option>
+            </select>
           </div>
           <div>
             <label className="block font-mono text-xs uppercase mb-1">Foto</label>
@@ -2079,7 +2069,15 @@ function TeamTab({ editLang }: { editLang: "pt" | "en" }) {
                 <p className="font-mono text-[10px] uppercase text-primary tracking-[0.3em]">{member.codename}</p>
                 <h3 className="font-display text-2xl uppercase">{member.name}</h3>
               </div>
-              <div className="font-mono text-xs border-2 border-border px-2 py-1">#{member.sortOrder}</div>
+              <div
+                className={`font-mono text-[10px] uppercase border-2 px-2 py-1 tracking-wider ${
+                  member.memberGroup === "band"
+                    ? "border-primary text-primary bg-primary/10"
+                    : "border-border text-foreground/80"
+                }`}
+              >
+                {member.memberGroup === "band" ? "banda" : "contrib."}
+              </div>
             </div>
             <p className="font-mono text-sm uppercase text-foreground/70">{(member.role as any)?.[editLang] || (member.role as any)?.pt} / {member.age} anos</p>
             {member.photoUrl ? (

@@ -19,6 +19,8 @@ export interface AnnouncementInput {
   isActive?: boolean;
 }
 
+export type TeamMemberGroup = "band" | "contributor";
+
 export interface TeamMember {
   id: number;
   name: string;
@@ -27,7 +29,7 @@ export interface TeamMember {
   age: number;
   bio?: LocalizedText | null;
   photoUrl?: string | null;
-  sortOrder: number;
+  memberGroup: TeamMemberGroup;
   createdAt: string;
 }
 
@@ -38,7 +40,7 @@ export interface TeamMemberInput {
   age: number;
   bio?: LocalizedText | null;
   photoUrl?: string | null;
-  sortOrder?: number;
+  memberGroup?: TeamMemberGroup;
 }
 
 // Announcements Hooks

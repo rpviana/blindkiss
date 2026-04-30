@@ -11,20 +11,7 @@ import { requireAdmin } from "../lib/auth";
 
 const router: IRouter = Router();
 
-function serialize(row: {
-  id: number;
-  title: string;
-  venue: string;
-  city: string;
-  address: string;
-  maps_url: string | null;
-  ticket_url: string | null;
-  price: string | null;
-  event_date: Date;
-  poster_url: string | null;
-  description: string | null;
-  force_past: boolean;
-}) {
+function serialize(row: any) {
   const isPast = row.force_past || row.event_date.getTime() < Date.now();
   return {
     id: row.id,
@@ -66,16 +53,16 @@ router.post("/events", requireAdmin, async (req, res) => {
   const body = CreateEventBody.parse(req.body);
   const row = await prisma.events.create({
     data: {
-      title: body.title,
-      venue: body.venue,
-      city: body.city,
+      title: body.title as any,
+      venue: body.venue as any,
+      city: body.city as any,
       address: body.address,
       maps_url: body.mapsUrl ?? null,
       ticket_url: body.ticketUrl ?? null,
       price: body.price ?? null,
       event_date: body.eventDate,
       poster_url: body.posterUrl ?? null,
-      description: body.description ?? null,
+      description: (body.description as any) ?? null,
       force_past: body.forcePast ?? false,
     },
   });
@@ -88,16 +75,16 @@ router.put("/events/:id", requireAdmin, async (req, res) => {
   const row = await prisma.events.update({
     where: { id },
     data: {
-      title: body.title,
-      venue: body.venue,
-      city: body.city,
+      title: body.title as any,
+      venue: body.venue as any,
+      city: body.city as any,
       address: body.address,
       maps_url: body.mapsUrl ?? null,
       ticket_url: body.ticketUrl ?? null,
       price: body.price ?? null,
       event_date: body.eventDate,
       poster_url: body.posterUrl ?? null,
-      description: body.description ?? null,
+      description: (body.description as any) ?? null,
       force_past: body.forcePast ?? false,
     },
   });

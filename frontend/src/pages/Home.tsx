@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useGetSiteSettings, useListContentBlocks } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 import { EyeLogo } from "@/components/EyeLogo";
 import { MarqueeStrip } from "@/components/MarqueeStrip";
 import { RecruitmentPoster } from "@/components/RecruitmentPoster";
@@ -9,6 +10,7 @@ import { CassettePlayer } from "@/components/CassettePlayer";
 export default function Home() {
   const { data: settings } = useGetSiteSettings();
   const { data: blocks } = useListContentBlocks();
+  const { t } = useLanguage();
 
   const bioBlock = Array.isArray(blocks) ? blocks.find((b) => b.key === "bio") : undefined;
   const manifestoBlock = Array.isArray(blocks) ? blocks.find((b) => b.key === "manifesto") : undefined;
@@ -35,7 +37,7 @@ export default function Home() {
           className="z-10 text-center max-w-4xl"
         >
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-tighter uppercase mb-6 drop-shadow-md">
-            {settings?.heroTagline || "BLINDKISS // PORTO"}
+            {t(settings?.heroTagline) || "BLINDKISS // PORTO"}
           </h1>
         </motion.div>
 
@@ -56,10 +58,10 @@ export default function Home() {
               className="border-l-8 border-primary pl-8"
             >
               <h2 className="font-display text-4xl md:text-6xl mb-8">
-                {bioBlock.title}
+                {t(bioBlock.title)}
               </h2>
               <div className="font-mono text-lg md:text-xl leading-relaxed whitespace-pre-wrap text-foreground/90">
-                {bioBlock.body}
+                {t(bioBlock.body)}
               </div>
             </motion.div>
           </div>
@@ -88,10 +90,10 @@ export default function Home() {
               className="text-center"
             >
               <h2 className="font-display text-5xl md:text-7xl mb-8 text-primary uppercase">
-                {manifestoBlock.title || "[ MANIFESTO ]"}
+                {t(manifestoBlock.title) || "[ MANIFESTO ]"}
               </h2>
               <div className="font-mono text-xl md:text-2xl font-bold leading-relaxed whitespace-pre-wrap border-y-4 border-border py-12">
-                {manifestoBlock.body}
+                {t(manifestoBlock.body)}
               </div>
             </motion.div>
           </div>

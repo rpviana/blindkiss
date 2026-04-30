@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { customFetch } from "./custom-fetch";
+import { LocalizedText } from "./generated/api.schemas";
 
 export interface Announcement {
   id: number;
@@ -18,26 +19,28 @@ export interface AnnouncementInput {
   isActive?: boolean;
 }
 
+export type TeamMemberGroup = "band" | "contributor";
+
 export interface TeamMember {
   id: number;
   name: string;
-  role: string;
+  role: LocalizedText;
   codename: string;
   age: number;
-  bio?: string | null;
+  bio?: LocalizedText | null;
   photoUrl?: string | null;
-  sortOrder: number;
+  memberGroup: TeamMemberGroup;
   createdAt: string;
 }
 
 export interface TeamMemberInput {
   name: string;
-  role: string;
+  role: LocalizedText;
   codename: string;
   age: number;
-  bio?: string | null;
+  bio?: LocalizedText | null;
   photoUrl?: string | null;
-  sortOrder?: number;
+  memberGroup?: TeamMemberGroup;
 }
 
 // Announcements Hooks
@@ -312,8 +315,8 @@ export type VaultAssetType = "setlist_pdf" | "backstage_photo" | "wallpaper";
 export interface VaultAsset {
   id: number;
   assetType: VaultAssetType;
-  title: string;
-  description?: string | null;
+  title: LocalizedText;
+  description?: LocalizedText | null;
   fileUrl: string;
   previewUrl?: string | null;
   isActive: boolean;
@@ -329,8 +332,8 @@ export interface VaultAccessResponse {
 
 export interface VaultAssetInput {
   assetType: VaultAssetType;
-  title: string;
-  description?: string | null;
+  title: LocalizedText;
+  description?: LocalizedText | null;
   fileUrl: string;
   previewUrl?: string | null;
   isActive?: boolean;
@@ -397,15 +400,15 @@ export const useDeleteVaultAsset = () => {
 
 export interface PressKit {
   id: number;
-  bioShort: string;
-  technicalRider: string;
+  bioShort: LocalizedText;
+  technicalRider: LocalizedText;
   photoUrls: string[];
   updatedAt: string;
 }
 
 export interface PressKitInput {
-  bioShort: string;
-  technicalRider: string;
+  bioShort: LocalizedText;
+  technicalRider: LocalizedText;
   photoUrls: string[];
 }
 

@@ -7,10 +7,48 @@ export interface IdCardProps {
   serial: string;
   supporterNumber?: number | null;
   photoUrl?: string | null;
+  /** UI labels on the card; defaults to PT */
+  language?: "pt" | "en";
 }
 
+const idCardLabels = {
+  pt: {
+    authorized: "AUTORIZADO",
+    subtitle: "ID Oficial de Apoio",
+    memberName: "NOME DO MEMBRO",
+    unknown: "INDIVÍDUO DESCONHECIDO",
+    serial: "NÚMERO DE SÉRIE",
+    supporterNo: "NÚMERO DE APOIANTE",
+    footer: (
+      <>
+        VÁLIDO EM TODO O PAÍS
+        <br />
+        NÃO DUPLICAR
+      </>
+    ),
+    verified: "VERIFICADO",
+  },
+  en: {
+    authorized: "AUTHORIZED",
+    subtitle: "Official Support ID",
+    memberName: "MEMBER NAME",
+    unknown: "UNKNOWN INDIVIDUAL",
+    serial: "SERIAL NUMBER",
+    supporterNo: "SUPPORTER NUMBER",
+    footer: (
+      <>
+        VALID NATIONWIDE
+        <br />
+        DO NOT DUPLICATE
+      </>
+    ),
+    verified: "VERIFIED",
+  },
+} as const;
+
 export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
-  ({ name, serial, supporterNumber, photoUrl }, ref) => {
+  ({ name, serial, supporterNumber, photoUrl, language = "pt" }, ref) => {
+    const L = idCardLabels[language];
     return (
       <div 
         ref={ref}
@@ -40,7 +78,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           
           {/* Vertical Text */}
           <div className="absolute bottom-4 -right-10 origin-bottom-left -rotate-90 font-display text-white/30 text-4xl tracking-widest whitespace-nowrap pointer-events-none mix-blend-overlay">
-            AUTORIZADO
+            {L.authorized}
           </div>
         </div>
 
@@ -51,7 +89,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
             <div>
               <h2 className="font-display text-3xl leading-none text-[#111] tracking-wider uppercase">BLINDKISS</h2>
               <div className="font-mono text-[10px] font-bold text-[#910802] uppercase tracking-widest mt-1">
-                ID Oficial de Apoio
+                {L.subtitle}
               </div>
             </div>
             <img src={logoUrl} alt="Logo" className="w-10 h-10 object-contain mix-blend-multiply" />
@@ -60,14 +98,14 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           {/* Details */}
           <div className="space-y-4 flex-1">
             <div>
-              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">NOME DO MEMBRO</div>
+              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">{L.memberName}</div>
               <div className="font-mono font-bold text-lg text-[#111] uppercase leading-tight truncate">
-                {name || "INDIVÍDUO DESCONHECIDO"}
+                {name || L.unknown}
               </div>
             </div>
 
             <div>
-              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">NÚMERO DE SÉRIE</div>
+              <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">{L.serial}</div>
               <div className="font-display text-2xl text-[#910802] tracking-widest">
                 {serial || "BK-00000"}
               </div>
@@ -75,7 +113,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
 
             {typeof supporterNumber === "number" && supporterNumber > 0 && (
               <div>
-                <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">NÚMERO DE APOIANTE</div>
+                <div className="font-mono text-[9px] text-[#555] uppercase font-bold mb-0.5">{L.supporterNo}</div>
                 <div className="font-display text-xl text-[#111] tracking-wider">
                   #{String(supporterNumber).padStart(4, "0")}
                 </div>
@@ -86,8 +124,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
           {/* Footer Bar */}
           <div className="mt-auto border-t-2 border-dashed border-[#111] pt-2 flex justify-between items-end">
              <div className="font-mono text-[8px] text-[#111] uppercase font-bold">
-               VÁLIDO EM TODO O PAÍS<br/>
-               NÃO DUPLICAR
+               {L.footer}
              </div>
              {/* Barcode mock */}
              <div className="h-8 w-32 flex gap-[2px] opacity-80 mix-blend-multiply items-end">
@@ -103,7 +140,7 @@ export const IdCard = forwardRef<HTMLDivElement, IdCardProps>(
 
         <div className="absolute top-1/2 right-4 -translate-y-1/2 rotate-12 pointer-events-none opacity-40 mix-blend-multiply">
            <div className="border-4 border-[#910802] text-[#910802] p-2 font-display text-2xl tracking-widest">
-             VERIFICADO
+             {L.verified}
            </div>
         </div>
       </div>

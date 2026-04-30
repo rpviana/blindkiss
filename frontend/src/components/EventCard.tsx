@@ -3,12 +3,14 @@ import { pt } from "date-fns/locale";
 import type { Event } from "@/api-client";
 import defaultPoster from "@assets/image_1777245740977.png";
 import { ExternalLink, MapPin, Ticket } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 interface EventCardProps {
   event: Event;
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const { t, language } = useLanguage();
   const isPast = event.isPast || event.forcePast;
   const date = parseISO(event.eventDate);
 
@@ -32,7 +34,7 @@ export function EventCard({ event }: EventCardProps) {
       <div className="relative aspect-[3/4] w-full overflow-hidden border-b-4 border-border bg-muted">
         <img
           src={event.posterUrl || defaultPoster}
-          alt={event.title}
+          alt={t(event.title)}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           style={{
             filter: "contrast(1.2) sepia(0.2) saturate(1.5) hue-rotate(-10deg) grain(0.5)",
@@ -44,7 +46,7 @@ export function EventCard({ event }: EventCardProps) {
         {isPast && (
           <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] flex items-center justify-center">
              <div className="border-4 border-foreground text-foreground px-6 py-2 font-display text-4xl rotate-12 tracking-widest opacity-80 mix-blend-difference">
-               PASSADO
+               {language === 'en' ? 'PAST' : 'PASSADO'}
              </div>
           </div>
         )}
@@ -53,22 +55,22 @@ export function EventCard({ event }: EventCardProps) {
       {/* Content */}
       <div className="flex flex-col flex-1 p-6">
         <h3 className="font-display text-2xl uppercase mb-2 line-clamp-2">
-          {event.title}
+          {t(event.title)}
         </h3>
         
         <div className="font-mono text-sm space-y-2 mb-6 flex-1 text-foreground/80">
           <div className="flex items-start gap-2">
             <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
-              <span className="font-bold text-foreground">{event.venue}</span>
+              <span className="font-bold text-foreground">{t(event.venue)}</span>
               <br />
-              {event.city} — {event.address}
+              {t(event.city)} — {event.address}
             </span>
           </div>
           
           {event.price && (
             <div className="flex items-center gap-2 font-bold text-primary mt-4">
-              <span>[ ENTRADA: {event.price} ]</span>
+              <span>[ {language === 'en' ? 'ENTRY' : 'ENTRADA'}: {event.price} ]</span>
             </div>
           )}
         </div>
@@ -83,7 +85,7 @@ export function EventCard({ event }: EventCardProps) {
               className="flex items-center justify-center gap-2 w-full py-3 bg-primary text-primary-foreground font-display tracking-widest uppercase hover:bg-foreground transition-colors"
             >
               <Ticket className="w-5 h-5" />
-              COMPRAR BILHETE
+              {language === 'en' ? 'BUY TICKET' : 'COMPRAR BILHETE'}
             </a>
           )}
           
@@ -95,7 +97,7 @@ export function EventCard({ event }: EventCardProps) {
               className="flex items-center justify-center gap-2 w-full py-2 border-2 border-border font-mono text-xs font-bold hover:bg-muted transition-colors uppercase"
             >
               <ExternalLink className="w-4 h-4" />
-              VER NO MAPA
+              {language === 'en' ? 'VIEW ON MAP' : 'VER NO MAPA'}
             </a>
           )}
         </div>

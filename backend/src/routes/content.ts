@@ -8,13 +8,7 @@ import { requireAdmin } from "../lib/auth";
 
 const router: IRouter = Router();
 
-function serialize(r: {
-  id: number;
-  key: string;
-  title: string | null;
-  body: string | null;
-  image_url: string | null;
-}) {
+function serialize(r: any) {
   return {
     id: r.id,
     key: r.key,
@@ -42,8 +36,8 @@ router.put("/content/:key", requireAdmin, async (req, res) => {
     const updated = await prisma.content_blocks.update({
       where: { key },
       data: {
-        title: body.title ?? null,
-        body: body.body ?? null,
+        title: (body.title as any) ?? null,
+        body: (body.body as any) ?? null,
         image_url: body.imageUrl ?? null,
         updated_at: new Date(),
       },
@@ -55,8 +49,8 @@ router.put("/content/:key", requireAdmin, async (req, res) => {
   const created = await prisma.content_blocks.create({
     data: {
       key,
-      title: body.title ?? null,
-      body: body.body ?? null,
+      title: (body.title as any) ?? null,
+      body: (body.body as any) ?? null,
       image_url: body.imageUrl ?? null,
     },
   });

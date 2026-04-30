@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useVaultAccess } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 import { toast } from "sonner";
 
 export default function Vault() {
+  const { t } = useLanguage();
   const [serial, setSerial] = useState("");
   const access = useVaultAccess();
 
@@ -69,7 +71,7 @@ export default function Vault() {
                     rel="noreferrer"
                     className="block border-2 border-border p-3 font-mono hover:bg-muted"
                   >
-                    {item.title}
+                    {t(item.title)}
                   </a>
                 ))}
                 {grouped.setlists.length === 0 && <p className="font-mono text-sm text-foreground/60">Sem setlists.</p>}
@@ -81,8 +83,8 @@ export default function Vault() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {grouped.backstage.map((item) => (
                   <a key={item.id} href={item.fileUrl} target="_blank" rel="noreferrer" className="block border-2 border-border p-2">
-                    <img src={item.previewUrl || item.fileUrl} alt={item.title} className="w-full h-48 object-cover" />
-                    <p className="font-mono text-xs mt-2">{item.title}</p>
+                    <img src={item.previewUrl || item.fileUrl} alt={t(item.title)} className="w-full h-48 object-cover" />
+                    <p className="font-mono text-xs mt-2">{t(item.title)}</p>
                   </a>
                 ))}
                 {grouped.backstage.length === 0 && <p className="font-mono text-sm text-foreground/60">Sem fotos.</p>}
@@ -94,8 +96,8 @@ export default function Vault() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {grouped.wallpapers.map((item) => (
                   <a key={item.id} href={item.fileUrl} target="_blank" rel="noreferrer" className="block border-2 border-border p-2">
-                    <img src={item.previewUrl || item.fileUrl} alt={item.title} className="w-full h-48 object-cover" />
-                    <p className="font-mono text-xs mt-2">{item.title}</p>
+                    <img src={item.previewUrl || item.fileUrl} alt={t(item.title)} className="w-full h-48 object-cover" />
+                    <p className="font-mono text-xs mt-2">{t(item.title)}</p>
                   </a>
                 ))}
                 {grouped.wallpapers.length === 0 && <p className="font-mono text-sm text-foreground/60">Sem wallpapers.</p>}

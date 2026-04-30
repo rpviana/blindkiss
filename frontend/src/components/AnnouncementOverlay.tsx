@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useListAnnouncements, Announcement } from "@/api-client";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { AlertTriangle, Info, X, Zap } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 interface SpawnedBit {
   id: string;
@@ -13,6 +14,7 @@ interface SpawnedBit {
 
 export function AnnouncementOverlay() {
   const { data: announcements = [] } = useListAnnouncements();
+  const { t } = useLanguage();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
   const [bits, setBits] = useState<SpawnedBit[]>([]);
@@ -123,11 +125,11 @@ export function AnnouncementOverlay() {
                 </div>
 
                 <h2 className="font-display text-4xl mb-6 uppercase tracking-tighter text-primary">
-                  {expandedAnnouncement.title}
+                  {t(expandedAnnouncement.title)}
                 </h2>
                 
                 <p className="font-mono text-lg font-bold leading-tight whitespace-pre-wrap mb-10 border-l-4 border-primary pl-4 py-2 bg-muted/30">
-                  {expandedAnnouncement.content}
+                  {t(expandedAnnouncement.content)}
                 </p>
 
                 <button

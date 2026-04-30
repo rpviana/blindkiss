@@ -1,6 +1,8 @@
 import { useGetPressKit } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Press() {
+  const { t } = useLanguage();
   const { data, isLoading } = useGetPressKit();
 
   if (isLoading || !data) {
@@ -17,12 +19,12 @@ export default function Press() {
       <div className="container mx-auto max-w-5xl p-4 md:p-8 space-y-8">
         <section className="border-4 border-border bg-card p-6">
           <h2 className="font-display text-3xl uppercase mb-4">Bio Curta</h2>
-          <p className="font-mono text-sm md:text-base leading-relaxed whitespace-pre-wrap">{data.bioShort}</p>
+          <p className="font-mono text-sm md:text-base leading-relaxed whitespace-pre-wrap">{t(data.bioShort)}</p>
         </section>
 
         <section className="border-4 border-border bg-card p-6">
           <h2 className="font-display text-3xl uppercase mb-4">Technical Rider</h2>
-          <pre className="font-mono text-xs md:text-sm whitespace-pre-wrap">{data.technicalRider}</pre>
+          <pre className="font-mono text-xs md:text-sm whitespace-pre-wrap">{t(data.technicalRider)}</pre>
         </section>
 
         <section className="border-4 border-border bg-card p-6">

@@ -15,8 +15,8 @@ model admins {
 
 model announcements {
   id         Int      @id @default(autoincrement())
-  title      String   @db.Text
-  content    String   @db.Text
+  title      Json     @db.JsonB
+  content    Json     @db.JsonB
   image_url  String?  @db.Text
   type       String   @default("glitch") @db.Text
   is_active  Boolean  @default(true)
@@ -37,32 +37,32 @@ model bkid_members {
 model content_blocks {
   id         Int      @id @default(autoincrement())
   key        String   @unique(map: "content_blocks_key_unique") @db.Text
-  title      String?  @db.Text
-  body       String?  @db.Text
+  title      Json?    @db.JsonB
+  body       Json?    @db.JsonB
   image_url  String?  @db.Text
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model events {
   id          Int      @id @default(autoincrement())
-  title       String   @db.Text
-  venue       String   @db.Text
-  city        String   @db.Text
+  title       Json     @db.JsonB
+  venue       Json     @db.JsonB
+  city        Json     @db.JsonB
   address     String   @db.Text
   maps_url    String?  @db.Text
   ticket_url  String?  @db.Text
   price       String?  @db.Text
   event_date  DateTime @db.Timestamptz(6)
   poster_url  String?  @db.Text
-  description String?  @db.Text
+  description Json?    @db.JsonB
   force_past  Boolean  @default(false)
   created_at  DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model press_kits {
   id              Int      @id @default(autoincrement())
-  bio_short       String   @db.Text
-  technical_rider String   @db.Text
+  bio_short       Json     @db.JsonB
+  technical_rider Json     @db.JsonB
   photo_urls      Json?    @db.JsonB
   updated_at      DateTime @default(now()) @db.Timestamptz(6)
 }
@@ -87,26 +87,26 @@ model site_settings {
   color_text               String   @default("#7d7573") @db.Text
   color_accent             String   @default("#910802") @db.Text
   glitch_mode              Boolean  @default(false)
-  recruitment_title        String   @default("WANTED") @db.Text
-  recruitment_subtitle     String   @default("blindkiss procura novos membros") @db.Text
-  recruitment_bassist      String   @default("BAIXISTA — disponibilidade para ensaios semanais e concertos no Porto.") @db.Text
-  recruitment_drummer      String   @default("BATERISTA — atitude crua, gosto pelo barulho, presença em palco.") @db.Text
+  recruitment_title        Json     @db.JsonB
+  recruitment_subtitle     Json     @db.JsonB
+  recruitment_bassist      Json     @db.JsonB
+  recruitment_drummer      Json     @db.JsonB
   recruitment_contact      String   @default("contacto@blindkiss.pt") @db.Text
-  hero_tagline             String   @default("RUÍDO COM BEIJOS // PORTO") @db.Text
+  hero_tagline             Json     @db.JsonB
   footer_coords            String   @default("41.1496° N, 8.6109° W") @db.Text
   footer_city              String   @default("PORTO — PT") @db.Text
   show_recruitment         Boolean  @default(true)
   show_recruitment_bassist  Boolean  @default(true)
   show_recruitment_drummer  Boolean  @default(true)
-  recruitment_urgent_text  String   @default("URGENTE") @db.Text
+  recruitment_urgent_text  Json     @db.JsonB
   show_recruitment_urgent  Boolean  @default(true)
-  marquee_text             String   @default("BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // ") @db.Text
+  marquee_text             Json     @db.JsonB
   logo_url                 String?  @db.Text
   home_logo_url            String?  @db.Text
-  archive_title            String   @default("[ ARQUIVO DE GIGS ]") @db.Text
-  archive_subtitle         String   @default("RUÍDO AO VIVO. TESTEMUNHO DO CAOS.") @db.Text
-  archive_upcoming_button  String   @default("PRÓXIMOS DISTÚRBIOS") @db.Text
-  archive_past_button      String   @default("ECOS PASSADOS") @db.Text
+  archive_title            Json     @db.JsonB
+  archive_subtitle         Json     @db.JsonB
+  archive_upcoming_button  Json     @db.JsonB
+  archive_past_button      Json     @db.JsonB
   updated_at               DateTime @default(now()) @db.Timestamptz(6)
 }
 
@@ -122,8 +122,8 @@ model tracks {
 model vault_assets {
   id          Int      @id @default(autoincrement())
   asset_type  String   @db.Text
-  title       String   @db.Text
-  description String?  @db.Text
+  title       Json     @db.JsonB
+  description Json?    @db.JsonB
   file_url    String   @db.Text
   preview_url String?  @db.Text
   is_active   Boolean  @default(true)
@@ -131,15 +131,20 @@ model vault_assets {
   created_at  DateTime @default(now()) @db.Timestamptz(6)
 }
 
+enum TeamMemberGroup {
+  band
+  contributor
+}
+
 model team_members {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.Text
-  role       String   @db.Text
-  codename   String   @db.Text
-  age        Int
-  bio        String?  @db.Text
-  photo_url  String?  @db.Text
-  sort_order Int      @default(0)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  id           Int               @id @default(autoincrement())
+  name         String            @db.Text
+  role         Json              @db.JsonB
+  codename     String            @db.Text
+  age          Int
+  bio          Json?             @db.JsonB
+  photo_url    String?           @db.Text
+  member_group TeamMemberGroup   @default(contributor)
+  created_at   DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime          @default(now()) @db.Timestamptz(6)
 }

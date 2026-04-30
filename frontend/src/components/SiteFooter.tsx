@@ -1,7 +1,14 @@
 import { useGetSiteSettings } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 import { Link } from "wouter";
 
+const footerTagline = {
+  pt: "BLINDKISS. TODOS OS DIREITOS RESERVADOS.",
+  en: "BLINDKISS. ALL RIGHTS RESERVED.",
+} as const;
+
 export function SiteFooter() {
+  const { language } = useLanguage();
   const { data: settings } = useGetSiteSettings();
 
   return (
@@ -29,7 +36,7 @@ export function SiteFooter() {
         </Link>
         
         <div className="text-xs font-mono text-foreground/50 uppercase mt-8">
-          RUÍDO COM BEIJOS. TODOS OS DIREITOS RESERVADOS.
+          {footerTagline[language]}
         </div>
       </div>
     </footer>

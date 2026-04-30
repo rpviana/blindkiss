@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useGetSiteSettings, useSubmitRecruitmentApplication } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 import { toast } from "sonner";
 
 export function RecruitmentPoster() {
   const { data: settings } = useGetSiteSettings();
+  const { t, language } = useLanguage();
   const submitAudition = useSubmitRecruitmentApplication();
   const [isOpen, setIsOpen] = useState(false);
   const [form, setForm] = useState({
@@ -40,22 +42,22 @@ export function RecruitmentPoster() {
 
         <div className="relative z-10 flex flex-col items-center text-center">
           <h2 className="font-display text-7xl md:text-8xl tracking-tighter text-[#111] leading-none mb-2">
-            {settings.recruitmentTitle || "PROCURA-SE"}
+            {t(settings.recruitmentTitle) || "PROCURA-SE"}
           </h2>
 
           <div className="w-full h-2 bg-[#111] mb-6"></div>
 
           <h3 className="font-display text-3xl md:text-4xl text-[#910802] mb-10 tracking-widest uppercase">
-            {settings.recruitmentSubtitle || "JUNTA-TE AO DISTÚRBIO"}
+            {t(settings.recruitmentSubtitle) || "JUNTA-TE AO DISTÚRBIO"}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mb-12">
             {settings.showRecruitmentBassist && (
               <div className="border-4 border-[#111] p-6 bg-white/50 backdrop-blur-sm relative rotate-[-2deg]">
                 <div className="absolute -top-3 -left-3 w-6 h-6 bg-[#910802] rounded-full border-2 border-[#111]"></div>
-                <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">BAIXISTA</h4>
+                <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">{language === 'en' ? 'BASSIST' : 'BAIXISTA'}</h4>
                 <p className="font-mono text-sm text-[#333] font-bold">
-                  {settings.recruitmentBassist || "GRAVE / DISTORÇÃO / ATITUDE"}
+                  {t(settings.recruitmentBassist) || "GRAVE / DISTORÇÃO / ATITUDE"}
                 </p>
               </div>
             )}
@@ -63,9 +65,9 @@ export function RecruitmentPoster() {
             {settings.showRecruitmentDrummer && (
               <div className="border-4 border-[#111] p-6 bg-white/50 backdrop-blur-sm relative rotate-[1deg]">
                 <div className="absolute -top-3 -right-3 w-6 h-6 bg-[#910802] rounded-full border-2 border-[#111]"></div>
-                <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">BATERISTA</h4>
+                <h4 className="font-display text-2xl text-[#111] mb-2 uppercase">{language === 'en' ? 'DRUMMER' : 'BATERISTA'}</h4>
                 <p className="font-mono text-sm text-[#333] font-bold">
-                  {settings.recruitmentDrummer || "PANCADA / RITMO / CAOS"}
+                  {t(settings.recruitmentDrummer) || "PANCADA / RITMO / CAOS"}
                 </p>
               </div>
             )}
@@ -73,10 +75,10 @@ export function RecruitmentPoster() {
 
           <div className="border-t-4 border-b-4 border-dashed border-[#111] py-6 w-full relative">
             <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#eaddce] px-4 font-mono font-bold text-sm">
-              [ CONTACTO ]
+              [ {language === 'en' ? 'CONTACT' : 'CONTACTO'} ]
             </span>
             <p className="font-mono text-xl md:text-2xl font-bold text-[#910802]">
-              {settings.recruitmentContact || "DM @BLINDKISSBAND"}
+              {t(settings.recruitmentContact) || "DM @BLINDKISSBAND"}
             </p>
           </div>
 
@@ -85,13 +87,13 @@ export function RecruitmentPoster() {
             onClick={() => setIsOpen(true)}
             className="mt-8 px-8 py-4 bg-[#111] text-[#eaddce] font-display text-xl tracking-widest uppercase border-4 border-[#111] hover:bg-[#910802] hover:border-[#910802] transition-colors"
           >
-            Submeter Audição
+            {language === 'en' ? 'Submit Audition' : 'Submeter Audição'}
           </button>
 
           {settings.showRecruitmentUrgent && (
             <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 opacity-80 rotate-[-15deg] pointer-events-none">
               <div className="border-4 border-[#910802] text-[#910802] px-4 py-2 font-display text-2xl tracking-widest mix-blend-multiply">
-                {settings.recruitmentUrgentText || "URGENTE"}
+                {t(settings.recruitmentUrgentText) || "URGENTE"}
               </div>
             </div>
           )}
@@ -106,9 +108,9 @@ export function RecruitmentPoster() {
               onClick={() => setIsOpen(false)}
               className="absolute top-3 right-3 font-mono text-xs border-2 border-border px-2 py-1 hover:bg-muted"
             >
-              FECHAR
+              {language === 'en' ? 'CLOSE' : 'FECHAR'}
             </button>
-            <h3 className="font-display text-3xl uppercase mb-6 text-primary">Submeter Audição</h3>
+            <h3 className="font-display text-3xl uppercase mb-6 text-primary">{language === 'en' ? 'Submit Audition' : 'Submeter Audição'}</h3>
             <form
               className="space-y-4"
               onSubmit={(e) => {
@@ -124,7 +126,7 @@ export function RecruitmentPoster() {
                   },
                   {
                     onSuccess: () => {
-                      toast.success("Audição submetida com sucesso.");
+                      toast.success(language === 'en' ? "Audition submitted successfully." : "Audição submetida com sucesso.");
                       setForm({
                         name: "",
                         email: "",
@@ -135,7 +137,7 @@ export function RecruitmentPoster() {
                       });
                       setIsOpen(false);
                     },
-                    onError: () => toast.error("Não foi possível submeter a audição."),
+                    onError: () => toast.error(language === 'en' ? "Failed to submit audition." : "Não foi possível submeter a audição."),
                   },
                 );
               }}
@@ -144,7 +146,7 @@ export function RecruitmentPoster() {
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Nome"
+                placeholder={language === 'en' ? "Name" : "Nome"}
                 className="w-full border-2 border-border bg-background p-3 font-mono"
               />
               <input
@@ -159,13 +161,13 @@ export function RecruitmentPoster() {
                 type="tel"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="Telefone"
+                placeholder={language === 'en' ? "Phone" : "Telefone"}
                 className="w-full border-2 border-border bg-background p-3 font-mono"
               />
               <input
                 value={form.instrument}
                 onChange={(e) => setForm({ ...form, instrument: e.target.value })}
-                placeholder="Instrumento (ex: Baixo/Bateria)"
+                placeholder={language === 'en' ? "Instrument (e.g. Bass/Drums)" : "Instrumento (ex: Baixo/Bateria)"}
                 className="w-full border-2 border-border bg-background p-3 font-mono"
               />
               <input
@@ -173,13 +175,13 @@ export function RecruitmentPoster() {
                 type="url"
                 value={form.mediaUrl}
                 onChange={(e) => setForm({ ...form, mediaUrl: e.target.value })}
-                placeholder="Link YouTube/Drive da audição"
+                placeholder={language === 'en' ? "YouTube/Drive audition link" : "Link YouTube/Drive da audição"}
                 className="w-full border-2 border-border bg-background p-3 font-mono"
               />
               <textarea
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                placeholder="Mensagem curta (opcional)"
+                placeholder={language === 'en' ? "Short message (optional)" : "Mensagem curta (opcional)"}
                 className="w-full border-2 border-border bg-background p-3 font-mono h-24"
               />
               <button
@@ -187,7 +189,7 @@ export function RecruitmentPoster() {
                 disabled={submitAudition.isPending}
                 className="w-full py-3 bg-primary text-primary-foreground font-display uppercase tracking-widest hover:bg-foreground disabled:opacity-50"
               >
-                {submitAudition.isPending ? "A ENVIAR..." : "ENVIAR AUDIÇÃO"}
+                {submitAudition.isPending ? (language === 'en' ? "SENDING..." : "A ENVIAR...") : (language === 'en' ? "SEND AUDITION" : "ENVIAR AUDIÇÃO")}
               </button>
             </form>
           </div>

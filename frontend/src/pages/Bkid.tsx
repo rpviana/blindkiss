@@ -5,6 +5,86 @@ import { toPng } from "html-to-image";
 import { Download, Upload, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Link } from "wouter";
+import { useLanguage } from "@/lib/i18n";
+
+const bkidUi = {
+  pt: {
+    heroTitle: "[ REGISTO BK-ID ]",
+    heroSubtitle: "PROGRAMA OFICIAL DE IDENTIFICAÇÃO DE APOIANTES.",
+    formTitle: "// ALISTA-TE AGORA",
+    labelName: "Nome do Operativo *",
+    placeholderName: "INTRODUZ A TUA DESIGNAÇÃO",
+    labelEmail: "Canal de Contacto (Email) *",
+    labelPhoto: "Scan Biométrico (Foto)",
+    photoOk: "SCAN ADQUIRIDO. CLICA PARA SUBSTITUIR.",
+    photoUpload: "CLICA PARA FAZER UPLOAD DO SCAN",
+    submitPending: "A GERAR...",
+    submit: "GERAR ID",
+    warning:
+      "AVISO: ESTE É UM REGISTO PERMANENTE. OS TEUS DADOS SERÃO ENCRIPTADOS. O CARTÃO ID GERADO PODE SER DESCARREGADO E USADO EM FUTUROS DISTÚRBIOS OFFLINE.",
+    preview: "PRÉ-VISUALIZAÇÃO",
+    recoverTitle: "Recuperar BK-ID",
+    recoverCta: "RECUPERAR CARTÃO",
+    confirmed: "REGISTO CONFIRMADO",
+    welcome: (name: string) => `Bem-vindo ao distúrbio, operativo ${name}.`,
+    vaultLink: "ACEDER AO VAULT",
+    download: "DESCARREGAR CARTÃO ID",
+    back: "VOLTAR",
+    close: "FECHAR",
+    recoverModalTitle: "Recuperar BK-ID",
+    recoverJoke: "Trapalhão, só não te esqueces da cabeça porque está agarrada.",
+    recoverPlaceholderName: "Nome usado no registo",
+    recoverPlaceholderEmail: "Email usado no registo",
+    recoverPending: "A PROCURAR...",
+    recoverSubmit: "RECUPERAR",
+    found: (name: string) => `Encontrámos o teu cartão, ${name}.`,
+    downloadCard: "DESCARREGAR CARTÃO",
+    goVault: "IR PARA O VAULT",
+    toastEmailExists: "Este email já está registado no BK-ID.",
+    toastCreateFail: "Não foi possível criar o BK-ID.",
+    toastPngFail: "Falha ao gerar imagem do cartão.",
+    toastNotFound: "Não encontramos BK-ID com esse nome + email.",
+    toastRecoverFail: "Falha ao recuperar BK-ID.",
+  },
+  en: {
+    heroTitle: "[ BK-ID REGISTRATION ]",
+    heroSubtitle: "OFFICIAL SUPPORTER IDENTIFICATION PROGRAM.",
+    formTitle: "// ENLIST NOW",
+    labelName: "Operative name *",
+    placeholderName: "ENTER YOUR DESIGNATION",
+    labelEmail: "Contact channel (email) *",
+    labelPhoto: "Biometric scan (photo)",
+    photoOk: "SCAN ACQUIRED. CLICK TO REPLACE.",
+    photoUpload: "CLICK TO UPLOAD SCAN",
+    submitPending: "GENERATING...",
+    submit: "GENERATE ID",
+    warning:
+      "WARNING: THIS IS A PERMANENT RECORD. YOUR DATA WILL BE ENCRYPTED. THE GENERATED ID CARD CAN BE DOWNLOADED AND USED IN FUTURE OFFLINE DISRUPTIONS.",
+    preview: "PREVIEW",
+    recoverTitle: "Recover BK-ID",
+    recoverCta: "RECOVER CARD",
+    confirmed: "REGISTRATION CONFIRMED",
+    welcome: (name: string) => `Welcome to the disruption, operative ${name}.`,
+    vaultLink: "OPEN THE VAULT",
+    download: "DOWNLOAD ID CARD",
+    back: "BACK",
+    close: "CLOSE",
+    recoverModalTitle: "Recover BK-ID",
+    recoverJoke: "Clumsy—at least you didn’t leave your head behind; it’s still attached.",
+    recoverPlaceholderName: "Name used at signup",
+    recoverPlaceholderEmail: "Email used at signup",
+    recoverPending: "SEARCHING...",
+    recoverSubmit: "RECOVER",
+    found: (name: string) => `We found your card, ${name}.`,
+    downloadCard: "DOWNLOAD CARD",
+    goVault: "GO TO VAULT",
+    toastEmailExists: "This email is already registered for BK-ID.",
+    toastCreateFail: "Could not create BK-ID.",
+    toastPngFail: "Failed to generate card image.",
+    toastNotFound: "No BK-ID found for that name + email.",
+    toastRecoverFail: "Failed to recover BK-ID.",
+  },
+} as const;
 
 type CardData = {
   name: string;
@@ -14,6 +94,8 @@ type CardData = {
 };
 
 export default function Bkid() {
+  const { language } = useLanguage();
+  const u = bkidUi[language];
   const createMember = useCreateBkidMember();
   const recoverMember = useRecoverBkidMember();
   
@@ -57,10 +139,10 @@ export default function Bkid() {
       onError: (error) => {
         const status = (error as { status?: number })?.status;
         if (status === 409) {
-          toast.error("Este email já está registado no BK-ID.");
+          toast.error(u.toastEmailExists);
           return;
         }
-        toast.error("Não foi possível criar o BK-ID.");
+        toast.error(u.toastCreateFail);
       }
     });
   };
@@ -78,7 +160,7 @@ export default function Bkid() {
       link.click();
     } catch (err) {
       console.error("Failed to generate image", err);
-      toast.error("Falha ao gerar imagem do cartão.");
+      toast.error(u.toastPngFail);
     }
   };
 
@@ -86,10 +168,10 @@ export default function Bkid() {
     <div className="min-h-screen flex flex-col bg-background">
       <div className="pt-20 md:pt-24 pb-8 md:pb-12 px-4 md:px-8 text-center border-b-8 border-border">
         <h1 className="font-display text-4xl sm:text-5xl md:text-7xl tracking-tighter uppercase mb-4 md:mb-6">
-          [ REGISTO BK-ID ]
+          {u.heroTitle}
         </h1>
         <p className="font-mono text-sm sm:text-base md:text-xl font-bold max-w-2xl mx-auto mb-6 md:mb-8">
-          PROGRAMA OFICIAL DE IDENTIFICAÇÃO DE APOIANTES.
+          {u.heroSubtitle}
         </p>
       </div>
 
@@ -99,13 +181,13 @@ export default function Bkid() {
             {/* Form */}
             <div className="border-4 border-border bg-card p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               <h2 className="font-display text-3xl mb-8 uppercase border-b-4 border-border pb-4">
-                // ALISTA-TE AGORA
+                {u.formTitle}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block font-mono text-sm font-bold uppercase mb-2">
-                    Nome do Operativo *
+                    {u.labelName}
                   </label>
                   <input
                     type="text"
@@ -114,13 +196,13 @@ export default function Bkid() {
                     value={name}
                     onChange={(e) => setName(e.target.value.toUpperCase())}
                     className="w-full bg-background border-4 border-border p-3 font-mono uppercase focus:border-primary focus:outline-none transition-colors"
-                    placeholder="INTRODUZ A TUA DESIGNAÇÃO"
+                    placeholder={u.placeholderName}
                   />
                 </div>
 
                 <div>
                   <label className="block font-mono text-sm font-bold uppercase mb-2">
-                    Canal de Contacto (Email) *
+                    {u.labelEmail}
                   </label>
                   <input
                     type="email"
@@ -134,7 +216,7 @@ export default function Bkid() {
 
                 <div>
                   <label className="block font-mono text-sm font-bold uppercase mb-2">
-                    Scan Biométrico (Foto)
+                    {u.labelPhoto}
                   </label>
                   <div className="border-4 border-dashed border-border p-6 text-center relative hover:bg-muted/50 transition-colors">
                     <input
@@ -146,7 +228,7 @@ export default function Bkid() {
                     <div className="flex flex-col items-center gap-2 pointer-events-none">
                       <Upload className="w-8 h-8 text-foreground/50" />
                       <span className="font-mono text-sm">
-                        {photoUrl ? "SCAN ADQUIRIDO. CLICA PARA SUBSTITUIR." : "CLICA PARA FAZER UPLOAD DO SCAN"}
+                        {photoUrl ? u.photoOk : u.photoUpload}
                       </span>
                     </div>
                   </div>
@@ -158,7 +240,7 @@ export default function Bkid() {
                     disabled={!name.trim() || !email.trim() || createMember.isPending}
                     className="w-full py-4 bg-primary text-primary-foreground font-display text-2xl tracking-widest uppercase hover:bg-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                   >
-                    {createMember.isPending ? "A GERAR..." : "GERAR ID"}
+                    {createMember.isPending ? u.submitPending : u.submit}
                   </button>
                 </div>
               </form>
@@ -169,21 +251,21 @@ export default function Bkid() {
               <div className="bg-yellow-500/20 border-4 border-yellow-500 p-6 text-yellow-800 dark:text-yellow-500 flex gap-4">
                 <AlertTriangle className="shrink-0 w-8 h-8" />
                 <div className="font-mono text-sm leading-relaxed font-bold uppercase">
-                  AVISO: ESTE É UM REGISTO PERMANENTE. OS TEUS DADOS SERÃO ENCRIPTADOS. O CARTÃO ID GERADO PODE SER DESCARREGADO E USADO EM FUTUROS DISTÚRBIOS OFFLINE.
+                  {u.warning}
                 </div>
               </div>
               
               <div className="border-4 border-border p-4 md:p-6 bg-muted/30 overflow-hidden flex justify-center">
                 <div className="flex flex-col items-center">
-                  <h3 className="font-display text-xl mb-4 w-full text-center md:text-left">PRÉ-VISUALIZAÇÃO</h3>
+                  <h3 className="font-display text-xl mb-4 w-full text-center md:text-left">{u.preview}</h3>
                   <div className="scale-[0.5] sm:scale-[0.7] md:scale-75 lg:scale-90 origin-center py-24 sm:py-32 md:py-0 md:static">
-                    <IdCard name={name || "SUBJECT_NAME"} serial="BK-2026-XXXXXX" photoUrl={photoUrl} />
+                    <IdCard name={name || "SUBJECT_NAME"} serial="BK-2026-XXXXXX" photoUrl={photoUrl} language={language} />
                   </div>
                 </div>
               </div>
 
               <div className="border-4 border-border bg-card p-4 md:p-6">
-                <h4 className="font-display text-2xl uppercase mb-3">Recuperar BK-ID</h4>
+                <h4 className="font-display text-2xl uppercase mb-3">{u.recoverTitle}</h4>
                 <button
                   type="button"
                   onClick={() => {
@@ -193,7 +275,7 @@ export default function Bkid() {
                   }}
                   className="w-full py-3 bg-foreground text-background font-display uppercase tracking-widest hover:bg-primary transition-colors"
                 >
-                  RECUPERAR CARTÃO
+                  {u.recoverCta}
                 </button>
               </div>
             </div>
@@ -201,15 +283,15 @@ export default function Bkid() {
         ) : (
           <div className="flex flex-col items-center animate-in fade-in zoom-in duration-500">
              <div className="mb-8 md:mb-12 text-center">
-               <h2 className="font-display text-3xl md:text-4xl text-primary mb-2 md:mb-4">REGISTO CONFIRMADO</h2>
+               <h2 className="font-display text-3xl md:text-4xl text-primary mb-2 md:mb-4">{u.confirmed}</h2>
                <p className="font-mono font-bold text-base md:text-xl uppercase px-4">
-                 Bem-vindo ao distúrbio, operativo {generatedCard.name}.
+                 {u.welcome(generatedCard.name)}
                </p>
                <Link
                  href="/vault"
                  className="inline-block mt-4 font-mono text-sm md:text-base uppercase text-primary underline hover:text-foreground transition-colors"
                >
-                 ACEDER AO VAULT
+                 {u.vaultLink}
                </Link>
              </div>
             
@@ -220,7 +302,8 @@ export default function Bkid() {
                     name={generatedCard.name} 
                     serial={generatedCard.serial} 
                     supporterNumber={generatedCard.supporterNumber}
-                    photoUrl={generatedCard.photoUrl} 
+                    photoUrl={generatedCard.photoUrl}
+                    language={language}
                   />
                </div>
             </div>
@@ -234,7 +317,7 @@ export default function Bkid() {
                 className="py-4 md:py-3 px-8 bg-primary text-primary-foreground font-display text-xl tracking-widest uppercase hover:bg-foreground transition-colors flex items-center justify-center gap-2 border-4 border-primary hover:border-foreground w-full sm:w-auto"
               >
                 <Download className="w-5 h-5" />
-                DESCARREGAR CARTÃO ID
+                {u.download}
               </button>
               
               <button
@@ -246,7 +329,7 @@ export default function Bkid() {
                 }}
                 className="py-4 md:py-3 px-8 bg-card text-foreground font-display text-xl tracking-widest uppercase hover:bg-muted transition-colors border-4 border-border w-full sm:w-auto text-center"
               >
-                VOLTAR
+                {u.back}
               </button>
             </div>
           </div>
@@ -261,11 +344,11 @@ export default function Bkid() {
               onClick={() => setIsRecoverOpen(false)}
               className="absolute top-3 right-3 font-mono text-xs border-2 border-border px-2 py-1 hover:bg-muted"
             >
-              FECHAR
+              {u.close}
             </button>
-            <h3 className="font-display text-3xl uppercase mb-2 text-primary">Recuperar BK-ID</h3>
+            <h3 className="font-display text-3xl uppercase mb-2 text-primary">{u.recoverModalTitle}</h3>
             <p className="font-mono text-xs md:text-sm uppercase mb-6 text-foreground/70">
-              Trapalhão, só não te esqueces da cabeça porque está agarrada.
+              {u.recoverJoke}
             </p>
 
             {!recoveredCard ? (
@@ -290,10 +373,10 @@ export default function Bkid() {
                       onError: (error) => {
                         const status = (error as { status?: number })?.status;
                         if (status === 404) {
-                          toast.error("Não encontramos BK-ID com esse nome + email.");
+                          toast.error(u.toastNotFound);
                           return;
                         }
-                        toast.error("Falha ao recuperar BK-ID.");
+                        toast.error(u.toastRecoverFail);
                       },
                     },
                   );
@@ -305,7 +388,7 @@ export default function Bkid() {
                   onChange={(e) =>
                     setRecoverForm({ ...recoverForm, name: e.target.value.toUpperCase() })
                   }
-                  placeholder="Nome usado no registo"
+                  placeholder={u.recoverPlaceholderName}
                   className="w-full border-2 border-border bg-background p-3 font-mono uppercase"
                 />
                 <input
@@ -313,7 +396,7 @@ export default function Bkid() {
                   type="email"
                   value={recoverForm.email}
                   onChange={(e) => setRecoverForm({ ...recoverForm, email: e.target.value })}
-                  placeholder="Email usado no registo"
+                  placeholder={u.recoverPlaceholderEmail}
                   className="w-full border-2 border-border bg-background p-3 font-mono"
                 />
                 <button
@@ -321,13 +404,13 @@ export default function Bkid() {
                   disabled={recoverMember.isPending}
                   className="w-full py-3 bg-primary text-primary-foreground font-display uppercase tracking-widest hover:bg-foreground disabled:opacity-50"
                 >
-                  {recoverMember.isPending ? "A PROCURAR..." : "RECUPERAR"}
+                  {recoverMember.isPending ? u.recoverPending : u.recoverSubmit}
                 </button>
               </form>
             ) : (
               <div className="space-y-4">
                 <p className="font-mono text-sm uppercase text-primary font-bold">
-                  Encontrámos o teu cartão, {recoveredCard.name}.
+                  {u.found(recoveredCard.name)}
                 </p>
                 <div className="border-4 border-border p-1 md:p-2 bg-background overflow-x-auto">
                   <div className="w-fit mx-auto">
@@ -337,6 +420,7 @@ export default function Bkid() {
                       serial={recoveredCard.serial}
                       supporterNumber={recoveredCard.supporterNumber}
                       photoUrl={recoveredCard.photoUrl}
+                      language={language}
                     />
                   </div>
                 </div>
@@ -346,13 +430,13 @@ export default function Bkid() {
                     onClick={() => void handleDownloadCard(recoveredCardRef, recoveredCard.serial)}
                     className="flex-1 py-3 bg-primary text-primary-foreground font-display uppercase tracking-widest hover:bg-foreground"
                   >
-                    DESCARREGAR CARTÃO
+                    {u.downloadCard}
                   </button>
                   <Link
                     href="/vault"
                     className="flex-1 py-3 text-center border-2 border-border font-display uppercase tracking-widest hover:bg-muted"
                   >
-                    IR PARA O VAULT
+                    {u.goVault}
                   </Link>
                 </div>
               </div>

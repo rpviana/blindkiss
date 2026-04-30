@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useGetSiteSettings } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 
 export function MarqueeStrip() {
   const { data: settings } = useGetSiteSettings();
-  const text = settings?.marqueeText || "BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // ";
+  const { t } = useLanguage();
+  const text = t(settings?.marqueeText) || "BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // ";
   // Duplicate enough times to ensure smooth scrolling
   const repeatedText = Array(10).fill(text).join("");
 

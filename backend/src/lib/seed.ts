@@ -171,7 +171,7 @@ export async function ensureSeedData(): Promise<void> {
             age: 17,
             bio: "Estrutura o sistema, limpa o ruído e transforma caos em código.",
             photo_url: null,
-            sort_order: 1,
+            member_group: "contributor",
           },
           {
             name: "João Moreira",
@@ -180,7 +180,7 @@ export async function ensureSeedData(): Promise<void> {
             age: 19,
             bio: "A voz central da Blindkiss, onde a tensão ganha forma.",
             photo_url: null,
-            sort_order: 2,
+            member_group: "band",
           },
           {
             name: "Ricardo Pais",
@@ -189,7 +189,7 @@ export async function ensureSeedData(): Promise<void> {
             age: 17,
             bio: "Gera linhas cortantes e devolve energia em ondas afiadas.",
             photo_url: null,
-            sort_order: 3,
+            member_group: "band",
           },
           {
             name: "Telmo Salgado",
@@ -198,7 +198,7 @@ export async function ensureSeedData(): Promise<void> {
             age: 17,
             bio: "Traduz o ruído da banda em presença, alcance e impacto.",
             photo_url: null,
-            sort_order: 4,
+            member_group: "contributor",
           },
           {
             name: "Bruna Silva",
@@ -207,7 +207,7 @@ export async function ensureSeedData(): Promise<void> {
             age: 17,
             bio: "Mantém a frequência certa entre a banda e o resto do mundo.",
             photo_url: null,
-            sort_order: 5,
+            member_group: "contributor",
           },
         ],
       });

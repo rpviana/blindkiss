@@ -5,6 +5,8 @@ import { requireAdmin } from "../lib/auth";
 
 const router: IRouter = Router();
 
+import { LocalizedTextSchema } from "../api-zod/index";
+
 const VaultAssetType = z.enum(["setlist_pdf", "backstage_photo", "wallpaper"]);
 
 const VaultAccessBody = z.object({
@@ -13,8 +15,8 @@ const VaultAccessBody = z.object({
 
 const VaultAssetBody = z.object({
   assetType: VaultAssetType,
-  title: z.string().min(1).max(180),
-  description: z.string().max(2000).nullish(),
+  title: LocalizedTextSchema,
+  description: LocalizedTextSchema.nullable().optional(),
   fileUrl: z.string().url(),
   previewUrl: z.string().url().nullish(),
   isActive: z.boolean().optional(),
@@ -27,17 +29,7 @@ function normalizeSerial(serial: string): string {
   return serial.trim().toUpperCase();
 }
 
-function serializeAsset(row: {
-  id: number;
-  asset_type: string;
-  title: string;
-  description: string | null;
-  file_url: string;
-  preview_url: string | null;
-  is_active: boolean;
-  sort_order: number;
-  created_at: Date;
-}) {
+function serializeAsset(row: any) {
   return {
     id: row.id,
     assetType: row.asset_type,
@@ -97,8 +89,8 @@ router.post("/admin/vault-assets", requireAdmin, async (req, res) => {
   const created = await prisma.vault_assets.create({
     data: {
       asset_type: body.assetType,
-      title: body.title,
-      description: body.description ?? null,
+      title: body.title as any,
+      description: (body.description as any) ?? null,
       file_url: body.fileUrl,
       preview_url: body.previewUrl ?? null,
       is_active: body.isActive ?? true,
@@ -115,8 +107,8 @@ router.patch("/admin/vault-assets/:id", requireAdmin, async (req, res) => {
     where: { id },
     data: {
       asset_type: body.assetType,
-      title: body.title,
-      description: body.description,
+      title: body.title as any,
+      description: body.description as any,
       file_url: body.fileUrl,
       preview_url: body.previewUrl,
       is_active: body.isActive,

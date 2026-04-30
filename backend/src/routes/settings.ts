@@ -10,36 +10,10 @@ async function getOrCreateRow() {
     orderBy: { id: "asc" },
   });
   if (row) return row;
-  return prisma.site_settings.create({ data: {} });
+  return prisma.site_settings.create({ data: {} as any });
 }
 
-function serialize(r: {
-  color_background: string;
-  color_title: string;
-  color_text: string;
-  color_accent: string;
-  glitch_mode: boolean;
-  recruitment_title: string;
-  recruitment_subtitle: string;
-  recruitment_bassist: string;
-  recruitment_drummer: string;
-  recruitment_contact: string;
-  hero_tagline: string;
-  footer_coords: string;
-  footer_city: string;
-  show_recruitment: boolean;
-  show_recruitment_bassist: boolean;
-  show_recruitment_drummer: boolean;
-  recruitment_urgent_text: string;
-  show_recruitment_urgent: boolean;
-  marquee_text: string;
-  logo_url: string | null;
-  home_logo_url: string | null;
-  archive_title: string;
-  archive_subtitle: string;
-  archive_upcoming_button: string;
-  archive_past_button: string;
-}) {
+function serialize(r: any) {
   return {
     colorBackground: r.color_background,
     colorTitle: r.color_title,
@@ -85,26 +59,26 @@ router.put("/settings", requireAdmin, async (req, res) => {
       color_text: body.colorText,
       color_accent: body.colorAccent,
       glitch_mode: body.glitchMode,
-      recruitment_title: body.recruitmentTitle,
-      recruitment_subtitle: body.recruitmentSubtitle,
-      recruitment_bassist: body.recruitmentBassist,
-      recruitment_drummer: body.recruitmentDrummer,
+      recruitment_title: body.recruitmentTitle as any,
+      recruitment_subtitle: body.recruitmentSubtitle as any,
+      recruitment_bassist: body.recruitmentBassist as any,
+      recruitment_drummer: body.recruitmentDrummer as any,
       recruitment_contact: body.recruitmentContact,
-      hero_tagline: body.heroTagline,
+      hero_tagline: body.heroTagline as any,
       footer_coords: body.footerCoords,
       footer_city: body.footerCity,
       show_recruitment: body.showRecruitment,
       show_recruitment_bassist: body.showRecruitmentBassist,
       show_recruitment_drummer: body.showRecruitmentDrummer,
-      recruitment_urgent_text: body.recruitmentUrgentText,
+      recruitment_urgent_text: body.recruitmentUrgentText as any,
       show_recruitment_urgent: body.showRecruitmentUrgent,
-      marquee_text: body.marqueeText,
+      marquee_text: body.marqueeText as any,
       logo_url: body.logoUrl,
       home_logo_url: body.homeLogoUrl,
-      archive_title: body.archiveTitle,
-      archive_subtitle: body.archiveSubtitle,
-      archive_upcoming_button: body.archiveUpcomingButton,
-      archive_past_button: body.archivePastButton,
+      archive_title: body.archiveTitle as any,
+      archive_subtitle: body.archiveSubtitle as any,
+      archive_upcoming_button: body.archiveUpcomingButton as any,
+      archive_past_button: body.archivePastButton as any,
       updated_at: new Date(),
     },
   });

@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useListTeamMembers } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Team() {
   const { data: members = [], isLoading } = useListTeamMembers();
+  const { t } = useLanguage();
   const [activeId, setActiveId] = useState<number | null>(null);
 
   const selected = useMemo(
@@ -60,12 +62,12 @@ export default function Team() {
                   <p className="font-mono text-xs uppercase tracking-[0.35em] text-primary">codename // {selected.codename}</p>
                   <h2 className="font-display text-4xl md:text-6xl uppercase mt-2 leading-none">{selected.name}</h2>
                   <p className="mt-3 font-mono text-sm md:text-base uppercase tracking-wide text-foreground/70">
-                    {selected.role} / {selected.age} anos
+                    {t(selected.role)} / {selected.age} anos
                   </p>
                 </div>
 
                 <p className="font-mono text-sm md:text-base leading-relaxed max-w-3xl text-foreground/80">
-                  {selected.bio || "Sinal em linha, pronto a entrar em foco."}
+                  {t(selected.bio) || "Sinal em linha, pronto a entrar em foco."}
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -84,7 +86,7 @@ export default function Team() {
                     >
                       <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/50">{member.codename}</p>
                       <p className="font-display text-xl uppercase mt-1">{member.name}</p>
-                      <p className="font-mono text-xs mt-1 text-foreground/70">{member.role}</p>
+                      <p className="font-mono text-xs mt-1 text-foreground/70">{t(member.role)}</p>
                     </button>
                   ))}
                 </div>
@@ -138,9 +140,9 @@ export default function Team() {
                     </div>
                     <div className="font-mono text-xs uppercase border-2 border-border px-2 py-1">{member.age}</div>
                   </div>
-                  <div className="font-mono text-sm uppercase tracking-wide text-foreground/70">{member.role}</div>
+                  <div className="font-mono text-sm uppercase tracking-wide text-foreground/70">{t(member.role)}</div>
                   <p className="font-mono text-xs leading-relaxed text-foreground/75">
-                    {member.bio || "Sem biografia disponível."}
+                    {t(member.bio) || "Sem biografia disponível."}
                   </p>
                 </div>
               </article>

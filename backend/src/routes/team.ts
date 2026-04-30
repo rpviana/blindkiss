@@ -5,27 +5,19 @@ import { requireAdmin } from "../lib/auth";
 
 const router: IRouter = Router();
 
+import { LocalizedTextSchema } from "../api-zod/index";
+
 const TeamMemberSchema = z.object({
   name: z.string().trim().min(1),
-  role: z.string().trim().min(1),
+  role: LocalizedTextSchema,
   codename: z.string().trim().min(1),
   age: z.coerce.number().int().min(1).max(120),
-  bio: z.string().trim().nullable().optional(),
+  bio: LocalizedTextSchema.nullable().optional(),
   photoUrl: z.string().trim().nullable().optional(),
   sortOrder: z.coerce.number().int().optional(),
 });
 
-function serialize(row: {
-  id: number;
-  name: string;
-  role: string;
-  codename: string;
-  age: number;
-  bio: string | null;
-  photo_url: string | null;
-  sort_order: number;
-  created_at: Date;
-}) {
+function serialize(row: any) {
   return {
     id: row.id,
     name: row.name,
@@ -58,10 +50,10 @@ router.post("/admin/team-members", requireAdmin, async (req, res) => {
   const row = await prisma.team_members.create({
     data: {
       name: body.name,
-      role: body.role,
+      role: body.role as any,
       codename: body.codename,
       age: body.age,
-      bio: body.bio ?? null,
+      bio: (body.bio as any) ?? null,
       photo_url: body.photoUrl ?? null,
       sort_order: body.sortOrder ?? 0,
     },
@@ -76,10 +68,10 @@ router.patch("/admin/team-members/:id", requireAdmin, async (req, res) => {
     where: { id },
     data: {
       name: body.name,
-      role: body.role,
+      role: body.role as any,
       codename: body.codename,
       age: body.age,
-      bio: body.bio,
+      bio: body.bio as any,
       photo_url: body.photoUrl,
       sort_order: body.sortOrder,
       updated_at: new Date(),

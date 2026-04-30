@@ -14,6 +14,11 @@ export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
 
+export const LocalizedTextSchema = zod.object({
+  pt: zod.string(),
+  en: zod.string(),
+});
+
 /**
  * @summary List events
  */
@@ -27,16 +32,16 @@ export const ListEventsQueryParams = zod.object({
 
 export const ListEventsResponseItem = zod.object({
   id: zod.number(),
-  title: zod.string(),
-  venue: zod.string(),
-  city: zod.string(),
+  title: LocalizedTextSchema,
+  venue: LocalizedTextSchema,
+  city: LocalizedTextSchema,
   address: zod.string(),
   mapsUrl: zod.string().nullish(),
   ticketUrl: zod.string().nullish(),
   price: zod.string().nullish(),
   eventDate: zod.coerce.date(),
   posterUrl: zod.string().nullish(),
-  description: zod.string().nullish(),
+  description: LocalizedTextSchema.nullish(),
   forcePast: zod.boolean(),
   isPast: zod.boolean(),
 });
@@ -46,31 +51,31 @@ export const ListEventsResponse = zod.array(ListEventsResponseItem);
  * @summary Create an event (admin)
  */
 export const CreateEventBody = zod.object({
-  title: zod.string(),
-  venue: zod.string(),
-  city: zod.string(),
+  title: LocalizedTextSchema,
+  venue: LocalizedTextSchema,
+  city: LocalizedTextSchema,
   address: zod.string(),
   mapsUrl: zod.string().nullish(),
   ticketUrl: zod.string().nullish(),
   price: zod.string().nullish(),
   eventDate: zod.coerce.date(),
   posterUrl: zod.string().nullish(),
-  description: zod.string().nullish(),
+  description: LocalizedTextSchema.nullish(),
   forcePast: zod.boolean().optional(),
 });
 
 export const CreateEventResponse = zod.object({
   id: zod.number(),
-  title: zod.string(),
-  venue: zod.string(),
-  city: zod.string(),
+  title: LocalizedTextSchema,
+  venue: LocalizedTextSchema,
+  city: LocalizedTextSchema,
   address: zod.string(),
   mapsUrl: zod.string().nullish(),
   ticketUrl: zod.string().nullish(),
   price: zod.string().nullish(),
   eventDate: zod.coerce.date(),
   posterUrl: zod.string().nullish(),
-  description: zod.string().nullish(),
+  description: LocalizedTextSchema.nullish(),
   forcePast: zod.boolean(),
   isPast: zod.boolean(),
 });
@@ -83,31 +88,31 @@ export const UpdateEventParams = zod.object({
 });
 
 export const UpdateEventBody = zod.object({
-  title: zod.string(),
-  venue: zod.string(),
-  city: zod.string(),
+  title: LocalizedTextSchema,
+  venue: LocalizedTextSchema,
+  city: LocalizedTextSchema,
   address: zod.string(),
   mapsUrl: zod.string().nullish(),
   ticketUrl: zod.string().nullish(),
   price: zod.string().nullish(),
   eventDate: zod.coerce.date(),
   posterUrl: zod.string().nullish(),
-  description: zod.string().nullish(),
+  description: LocalizedTextSchema.nullish(),
   forcePast: zod.boolean().optional(),
 });
 
 export const UpdateEventResponse = zod.object({
   id: zod.number(),
-  title: zod.string(),
-  venue: zod.string(),
-  city: zod.string(),
+  title: LocalizedTextSchema,
+  venue: LocalizedTextSchema,
+  city: LocalizedTextSchema,
   address: zod.string(),
   mapsUrl: zod.string().nullish(),
   ticketUrl: zod.string().nullish(),
   price: zod.string().nullish(),
   eventDate: zod.coerce.date(),
   posterUrl: zod.string().nullish(),
-  description: zod.string().nullish(),
+  description: LocalizedTextSchema.nullish(),
   forcePast: zod.boolean(),
   isPast: zod.boolean(),
 });
@@ -173,26 +178,26 @@ export const GetSiteSettingsResponse = zod.object({
   colorText: zod.string(),
   colorAccent: zod.string(),
   glitchMode: zod.boolean(),
-  recruitmentTitle: zod.string(),
-  recruitmentSubtitle: zod.string(),
-  recruitmentBassist: zod.string(),
-  recruitmentDrummer: zod.string(),
+  recruitmentTitle: LocalizedTextSchema,
+  recruitmentSubtitle: LocalizedTextSchema,
+  recruitmentBassist: LocalizedTextSchema,
+  recruitmentDrummer: LocalizedTextSchema,
   recruitmentContact: zod.string(),
-  heroTagline: zod.string(),
+  heroTagline: LocalizedTextSchema,
   footerCoords: zod.string(),
   footerCity: zod.string(),
   showRecruitment: zod.boolean(),
   showRecruitmentBassist: zod.boolean(),
   showRecruitmentDrummer: zod.boolean(),
-  recruitmentUrgentText: zod.string(),
+  recruitmentUrgentText: LocalizedTextSchema,
   showRecruitmentUrgent: zod.boolean(),
-  marqueeText: zod.string(),
+  marqueeText: LocalizedTextSchema,
   logoUrl: zod.string().nullish(),
   homeLogoUrl: zod.string().nullish(),
-  archiveTitle: zod.string(),
-  archiveSubtitle: zod.string(),
-  archiveUpcomingButton: zod.string(),
-  archivePastButton: zod.string(),
+  archiveTitle: LocalizedTextSchema,
+  archiveSubtitle: LocalizedTextSchema,
+  archiveUpcomingButton: LocalizedTextSchema,
+  archivePastButton: LocalizedTextSchema,
 });
 
 /**
@@ -204,26 +209,26 @@ export const UpdateSiteSettingsBody = zod.object({
   colorText: zod.string(),
   colorAccent: zod.string(),
   glitchMode: zod.boolean(),
-  recruitmentTitle: zod.string(),
-  recruitmentSubtitle: zod.string(),
-  recruitmentBassist: zod.string(),
-  recruitmentDrummer: zod.string(),
+  recruitmentTitle: LocalizedTextSchema,
+  recruitmentSubtitle: LocalizedTextSchema,
+  recruitmentBassist: LocalizedTextSchema,
+  recruitmentDrummer: LocalizedTextSchema,
   recruitmentContact: zod.string(),
-  heroTagline: zod.string(),
+  heroTagline: LocalizedTextSchema,
   footerCoords: zod.string(),
   footerCity: zod.string(),
   showRecruitment: zod.boolean(),
   showRecruitmentBassist: zod.boolean(),
   showRecruitmentDrummer: zod.boolean(),
-  recruitmentUrgentText: zod.string(),
+  recruitmentUrgentText: LocalizedTextSchema,
   showRecruitmentUrgent: zod.boolean(),
-  marqueeText: zod.string().optional(),
+  marqueeText: LocalizedTextSchema.optional(),
   logoUrl: zod.string().nullish().optional(),
   homeLogoUrl: zod.string().nullish().optional(),
-  archiveTitle: zod.string().optional(),
-  archiveSubtitle: zod.string().optional(),
-  archiveUpcomingButton: zod.string().optional(),
-  archivePastButton: zod.string().optional(),
+  archiveTitle: LocalizedTextSchema.optional(),
+  archiveSubtitle: LocalizedTextSchema.optional(),
+  archiveUpcomingButton: LocalizedTextSchema.optional(),
+  archivePastButton: LocalizedTextSchema.optional(),
 });
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -232,26 +237,26 @@ export const UpdateSiteSettingsResponse = zod.object({
   colorText: zod.string(),
   colorAccent: zod.string(),
   glitchMode: zod.boolean(),
-  recruitmentTitle: zod.string(),
-  recruitmentSubtitle: zod.string(),
-  recruitmentBassist: zod.string(),
-  recruitmentDrummer: zod.string(),
+  recruitmentTitle: LocalizedTextSchema,
+  recruitmentSubtitle: LocalizedTextSchema,
+  recruitmentBassist: LocalizedTextSchema,
+  recruitmentDrummer: LocalizedTextSchema,
   recruitmentContact: zod.string(),
-  heroTagline: zod.string(),
+  heroTagline: LocalizedTextSchema,
   footerCoords: zod.string(),
   footerCity: zod.string(),
   showRecruitment: zod.boolean(),
   showRecruitmentBassist: zod.boolean(),
   showRecruitmentDrummer: zod.boolean(),
-  recruitmentUrgentText: zod.string(),
+  recruitmentUrgentText: LocalizedTextSchema,
   showRecruitmentUrgent: zod.boolean(),
-  marqueeText: zod.string(),
+  marqueeText: LocalizedTextSchema,
   logoUrl: zod.string().nullish(),
   homeLogoUrl: zod.string().nullish(),
-  archiveTitle: zod.string(),
-  archiveSubtitle: zod.string(),
-  archiveUpcomingButton: zod.string(),
-  archivePastButton: zod.string(),
+  archiveTitle: LocalizedTextSchema,
+  archiveSubtitle: LocalizedTextSchema,
+  archiveUpcomingButton: LocalizedTextSchema,
+  archivePastButton: LocalizedTextSchema,
 });
 
 /**
@@ -260,8 +265,8 @@ export const UpdateSiteSettingsResponse = zod.object({
 export const ListContentBlocksResponseItem = zod.object({
   id: zod.number(),
   key: zod.string(),
-  title: zod.string().nullish(),
-  body: zod.string().nullish(),
+  title: LocalizedTextSchema.nullish(),
+  body: LocalizedTextSchema.nullish(),
   imageUrl: zod.string().nullish(),
 });
 export const ListContentBlocksResponse = zod.array(
@@ -276,16 +281,16 @@ export const UpdateContentBlockParams = zod.object({
 });
 
 export const UpdateContentBlockBody = zod.object({
-  title: zod.string().nullish(),
-  body: zod.string().nullish(),
+  title: LocalizedTextSchema.nullish(),
+  body: LocalizedTextSchema.nullish(),
   imageUrl: zod.string().nullish(),
 });
 
 export const UpdateContentBlockResponse = zod.object({
   id: zod.number(),
   key: zod.string(),
-  title: zod.string().nullish(),
-  body: zod.string().nullish(),
+  title: LocalizedTextSchema.nullish(),
+  body: LocalizedTextSchema.nullish(),
   imageUrl: zod.string().nullish(),
 });
 

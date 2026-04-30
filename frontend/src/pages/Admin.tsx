@@ -80,6 +80,7 @@ export default function Admin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [activeTab, setActiveTab] = useState<AdminTab>("settings");
+  const [editLang, setEditLang] = useState<"pt" | "en">("pt");
   const tabs: Array<{ id: AdminTab; label: string }> = [
     { id: "settings", label: "definições" },
     { id: "events", label: "eventos" },
@@ -154,15 +155,31 @@ export default function Admin() {
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b-4 border-border bg-card px-4 md:px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <h1 className="font-display text-xl md:text-2xl tracking-widest text-primary truncate mr-4">CONSOLA DE ADMIN</h1>
-        <button 
-          onClick={() => logout.mutate(undefined, { 
-            onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() }),
-            onError: () => toast.error("Erro ao sair.")
-          })}
-          className="flex items-center gap-2 font-mono text-xs md:text-sm font-bold hover:text-primary transition-colors shrink-0"
-        >
-          <LogOut size={16} /> SAIR
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex border-2 border-border p-1 bg-background">
+            <button 
+              onClick={() => setEditLang("pt")} 
+              className={`px-3 py-1 font-mono text-sm uppercase transition-colors ${editLang === "pt" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}
+            >
+              PT
+            </button>
+            <button 
+              onClick={() => setEditLang("en")} 
+              className={`px-3 py-1 font-mono text-sm uppercase transition-colors ${editLang === "en" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}
+            >
+              EN
+            </button>
+          </div>
+          <button 
+            onClick={() => logout.mutate(undefined, { 
+              onSuccess: () => qc.invalidateQueries({ queryKey: getAdminMeQueryKey() }),
+              onError: () => toast.error("Erro ao sair.")
+            })}
+            className="flex items-center gap-2 font-mono text-xs md:text-sm font-bold hover:text-primary transition-colors shrink-0"
+          >
+            <LogOut size={16} /> SAIR
+          </button>
+        </div>
       </header>
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
@@ -186,16 +203,21 @@ export default function Admin() {
         {/* Main Content */}
         <main className="flex-1 overflow-auto p-4 md:p-8 bg-background">
           <div className="max-w-5xl mx-auto">
-            {activeTab === "settings" && <SettingsTab />}
-            {activeTab === "events" && <EventsTab />}
+            {/* Mobile language toggle inside main content */}
+            <div className="md:hidden flex border-2 border-border p-1 bg-card mb-4">
+              <button onClick={() => setEditLang("pt")} className={`flex-1 py-2 font-mono text-sm uppercase transition-colors ${editLang === "pt" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}>PT</button>
+              <button onClick={() => setEditLang("en")} className={`flex-1 py-2 font-mono text-sm uppercase transition-colors ${editLang === "en" ? "bg-primary text-primary-foreground font-bold" : "text-foreground hover:bg-muted"}`}>EN</button>
+            </div>
+            {activeTab === "settings" && <SettingsTab editLang={editLang} />}
+            {activeTab === "events" && <EventsTab editLang={editLang} />}
             {activeTab === "bkid" && <BkidTab />}
-            {activeTab === "team" && <TeamTab />}
-            {activeTab === "content" && <ContentTab />}
+            {activeTab === "team" && <TeamTab editLang={editLang} />}
+            {activeTab === "content" && <ContentTab editLang={editLang} />}
               {activeTab === "tracks" && <TracksTab />}
-              {activeTab === "announcements" && <AnnouncementsTab />}
+              {activeTab === "announcements" && <AnnouncementsTab editLang={editLang} />}
               {activeTab === "auditions" && <AuditionsTab />}
-              {activeTab === "vault" && <VaultTab />}
-              {activeTab === "presskit" && <PressKitTab />}
+              {activeTab === "vault" && <VaultTab editLang={editLang} />}
+              {activeTab === "presskit" && <PressKitTab editLang={editLang} />}
 
           </div>
         </main>
@@ -204,7 +226,7 @@ export default function Admin() {
   );
 }
 
-function SettingsTab() {
+function SettingsTab({ editLang }: { editLang: "pt" | "en" }) {
   const qc = useQueryClient();
   const { data: settings } = useGetSiteSettings();
   const updateSettings = useUpdateSiteSettings();
@@ -222,6 +244,16 @@ function SettingsTab() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setForm({ ...form, [e.target.name]: value });
+  };
+
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
   };
 
   const handleImageUpload = (field: "logoUrl" | "homeLogoUrl") =>
@@ -293,25 +325,25 @@ function SettingsTab() {
           
           <div>
             <label className="block font-mono text-sm mb-1">Slogan Principal (Hero)</label>
-            <input type="text" name="heroTagline" value={form.heroTagline} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
+            <input type="text" name="heroTagline" value={form.heroTagline?.[editLang] || ""} onChange={e => handleLocalizedChange("heroTagline", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-mono text-sm mb-1">Título de Recrutamento</label>
-              <input type="text" name="recruitmentTitle" value={form.recruitmentTitle} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
+              <input type="text" name="recruitmentTitle" value={form.recruitmentTitle?.[editLang] || ""} onChange={e => handleLocalizedChange("recruitmentTitle", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
               <label className="block font-mono text-sm mb-1">Subtítulo de Recrutamento</label>
-              <input type="text" name="recruitmentSubtitle" value={form.recruitmentSubtitle} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
+              <input type="text" name="recruitmentSubtitle" value={form.recruitmentSubtitle?.[editLang] || ""} onChange={e => handleLocalizedChange("recruitmentSubtitle", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
               <label className="block font-mono text-sm mb-1">Recrutamento: Baixista</label>
-              <input type="text" name="recruitmentBassist" value={form.recruitmentBassist} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
+              <input type="text" name="recruitmentBassist" value={form.recruitmentBassist?.[editLang] || ""} onChange={e => handleLocalizedChange("recruitmentBassist", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div>
               <label className="block font-mono text-sm mb-1">Recrutamento: Baterista</label>
-              <input type="text" name="recruitmentDrummer" value={form.recruitmentDrummer} onChange={handleChange} className="w-full border-2 border-border p-2 font-mono bg-background" />
+              <input type="text" name="recruitmentDrummer" value={form.recruitmentDrummer?.[editLang] || ""} onChange={e => handleLocalizedChange("recruitmentDrummer", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background" />
             </div>
             <div className="md:col-span-2">
               <label className="block font-mono text-sm mb-1">Contacto de Recrutamento</label>
@@ -339,8 +371,8 @@ function SettingsTab() {
             <input 
               type="text" 
               name="marqueeText" 
-              value={form.marqueeText} 
-              onChange={handleChange} 
+              value={form.marqueeText?.[editLang] || ""} 
+              onChange={e => handleLocalizedChange("marqueeText", e.target.value)} 
               className="w-full border-2 border-border p-2 font-mono bg-background" 
               placeholder="BLIND KISS // DEIXA-TE IR // SENTE O CAOS // PORTO // "
             />
@@ -415,8 +447,8 @@ function SettingsTab() {
             <input 
               type="text" 
               name="archiveTitle" 
-              value={form.archiveTitle} 
-              onChange={handleChange} 
+              value={form.archiveTitle?.[editLang] || ""} 
+              onChange={e => handleLocalizedChange("archiveTitle", e.target.value)} 
               className="w-full border-2 border-border p-2 font-mono bg-background" 
               placeholder="[ ARQUIVO DE GIGS ]"
             />
@@ -427,8 +459,8 @@ function SettingsTab() {
             <input 
               type="text" 
               name="archiveSubtitle" 
-              value={form.archiveSubtitle} 
-              onChange={handleChange} 
+              value={form.archiveSubtitle?.[editLang] || ""} 
+              onChange={e => handleLocalizedChange("archiveSubtitle", e.target.value)} 
               className="w-full border-2 border-border p-2 font-mono bg-background" 
               placeholder="RUÍDO AO VIVO. TESTEMUNHO DO CAOS."
             />
@@ -440,8 +472,8 @@ function SettingsTab() {
               <input 
                 type="text" 
                 name="archiveUpcomingButton" 
-                value={form.archiveUpcomingButton} 
-                onChange={handleChange} 
+                value={form.archiveUpcomingButton?.[editLang] || ""} 
+                onChange={e => handleLocalizedChange("archiveUpcomingButton", e.target.value)} 
                 className="w-full border-2 border-border p-2 font-mono bg-background" 
                 placeholder="PRÓXIMOS DISTÚRBIOS"
               />
@@ -451,8 +483,8 @@ function SettingsTab() {
               <input 
                 type="text" 
                 name="archivePastButton" 
-                value={form.archivePastButton} 
-                onChange={handleChange} 
+                value={form.archivePastButton?.[editLang] || ""} 
+                onChange={e => handleLocalizedChange("archivePastButton", e.target.value)} 
                 className="w-full border-2 border-border p-2 font-mono bg-background" 
                 placeholder="ECOS PASSADOS"
               />
@@ -487,7 +519,7 @@ function SettingsTab() {
 
           <div className="pt-4">
             <label className="block font-mono text-sm mb-1">Texto do Selo (ex: URGENTE)</label>
-            <input type="text" name="recruitmentUrgentText" value={form.recruitmentUrgentText} onChange={handleChange} className="w-full md:w-1/3 border-2 border-border p-2 font-mono bg-background" />
+            <input type="text" name="recruitmentUrgentText" value={form.recruitmentUrgentText?.[editLang] || ""} onChange={e => handleLocalizedChange("recruitmentUrgentText", e.target.value)} className="w-full md:w-1/3 border-2 border-border p-2 font-mono bg-background" />
           </div>
         </div>
 
@@ -499,7 +531,7 @@ function SettingsTab() {
   );
 }
 
-function EventsTab() {
+function EventsTab({ editLang }: { editLang: "pt" | "en" }) {
   const qc = useQueryClient();
   const { data: events = [] } = useListEvents({ status: "all" }, { query: { queryKey: getListEventsQueryKey({status:"all"}) }});
   const createEvent = useCreateEvent();
@@ -509,11 +541,27 @@ function EventsTab() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   
-  const [form, setForm] = useState({
-    title: "", venue: "", city: "", address: "", mapsUrl: "", ticketUrl: "", price: "", eventDate: new Date().toISOString().slice(0, 16), posterUrl: "", description: "", forcePast: false
-  });
+  const defaultForm = {
+    title: { pt: "", en: "" } as any, 
+    venue: { pt: "", en: "" } as any, 
+    city: { pt: "", en: "" } as any, 
+    address: "", mapsUrl: "", ticketUrl: "", price: "", eventDate: new Date().toISOString().slice(0, 16), posterUrl: "", 
+    description: { pt: "", en: "" } as any, 
+    forcePast: false
+  };
 
-  const resetForm = () => setForm({ title: "", venue: "", city: "", address: "", mapsUrl: "", ticketUrl: "", price: "", eventDate: new Date().toISOString().slice(0, 16), posterUrl: "", description: "", forcePast: false });
+  const [form, setForm] = useState(defaultForm);
+  const resetForm = () => setForm({ ...defaultForm, eventDate: new Date().toISOString().slice(0, 16) });
+
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
+  };
 
   const handleSave = () => {
     const payload = {
@@ -563,10 +611,10 @@ function EventsTab() {
         <div className="border-4 border-border bg-card p-4 md:p-6">
           <h3 className="font-display text-xl mb-4">{editingId ? "EDITAR EVENTO" : "NOVO EVENTO"}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-             <input placeholder="Título *" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Título *" value={form.title?.[editLang] || ""} onChange={e=>handleLocalizedChange("title", e.target.value)} className="border-2 border-border p-2 font-mono bg-background" />
              <input type="datetime-local" value={form.eventDate} onChange={e=>setForm({...form, eventDate: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
-             <input placeholder="Local *" value={form.venue} onChange={e=>setForm({...form, venue: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
-             <input placeholder="Cidade *" value={form.city} onChange={e=>setForm({...form, city: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Local *" value={form.venue?.[editLang] || ""} onChange={e=>handleLocalizedChange("venue", e.target.value)} className="border-2 border-border p-2 font-mono bg-background" />
+             <input placeholder="Cidade *" value={form.city?.[editLang] || ""} onChange={e=>handleLocalizedChange("city", e.target.value)} className="border-2 border-border p-2 font-mono bg-background" />
              <input placeholder="Morada *" value={form.address} onChange={e=>setForm({...form, address: e.target.value})} className="border-2 border-border p-2 font-mono bg-background md:col-span-2" />
              <input placeholder="Preço (ex: 10€)" value={form.price} onChange={e=>setForm({...form, price: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
              <input placeholder="Poster URL" value={form.posterUrl} onChange={e=>setForm({...form, posterUrl: e.target.value})} className="border-2 border-border p-2 font-mono bg-background" />
@@ -600,15 +648,15 @@ function EventsTab() {
             {events.map((e) => (
               <tr key={e.id} className="border-b border-border/50 hover:bg-muted/20">
                 <td className="p-3">{format(new Date(e.eventDate), "dd MMM yyyy")}</td>
-                <td className="p-3 font-bold">{e.title}</td>
-                <td className="p-3">{e.venue}, {e.city}</td>
+             <td className="p-3 font-bold">{e.title?.[editLang] || e.title?.pt}</td>
+             <td className="p-3">{(e.venue as any)?.[editLang] || (e.venue as any)?.pt}, {(e.city as any)?.[editLang] || (e.city as any)?.pt}</td>
                 <td className="p-3">
                   {e.isPast || e.forcePast ? <span className="text-foreground/50">PASSADO</span> : <span className="text-primary font-bold">PRÓXIMO</span>}
                 </td>
                 <td className="p-3 flex gap-2">
                   <button onClick={() => { 
                     setEditingId(e.id); 
-                    setForm({ title: e.title, venue: e.venue, city: e.city, address: e.address, mapsUrl: e.mapsUrl || "", ticketUrl: e.ticketUrl || "", price: e.price || "", eventDate: e.eventDate.slice(0,16), posterUrl: e.posterUrl || "", description: e.description || "", forcePast: e.forcePast });
+                    setForm({ title: e.title as any, venue: e.venue as any, city: e.city as any, address: e.address, mapsUrl: e.mapsUrl || "", ticketUrl: e.ticketUrl || "", price: e.price || "", eventDate: e.eventDate.slice(0,16), posterUrl: e.posterUrl || "", description: e.description as any, forcePast: e.forcePast });
                   }} className="text-blue-600 hover:text-blue-800"><Edit2 size={18}/></button>
                   <button onClick={() => {
                     if (confirm("Delete this event?")) {
@@ -635,17 +683,17 @@ function EventsTab() {
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-mono text-xs text-foreground/50">{format(new Date(e.eventDate), "dd MMM yyyy")}</p>
-                <h4 className="font-display text-xl uppercase text-primary">{e.title}</h4>
+                <h4 className="font-display text-xl uppercase text-primary">{(e.title as any)?.[editLang] || (e.title as any)?.pt}</h4>
               </div>
               <div className="font-mono text-[10px] font-bold border border-border px-2 py-0.5 uppercase">
                 {e.isPast || e.forcePast ? "PAST" : "UPCOMING"}
               </div>
             </div>
-            <p className="font-mono text-sm">{e.venue}, {e.city}</p>
+            <p className="font-mono text-sm">{(e.venue as any)?.[editLang] || (e.venue as any)?.pt}, {(e.city as any)?.[editLang] || (e.city as any)?.pt}</p>
             <div className="flex gap-4 pt-2 border-t border-border/20">
               <button onClick={() => { 
                 setEditingId(e.id); 
-                setForm({ title: e.title, venue: e.venue, city: e.city, address: e.address, mapsUrl: e.mapsUrl || "", ticketUrl: e.ticketUrl || "", price: e.price || "", eventDate: e.eventDate.slice(0,16), posterUrl: e.posterUrl || "", description: e.description || "", forcePast: e.forcePast });
+                setForm({ title: e.title as any, venue: e.venue as any, city: e.city as any, address: e.address, mapsUrl: e.mapsUrl || "", ticketUrl: e.ticketUrl || "", price: e.price || "", eventDate: e.eventDate.slice(0,16), posterUrl: e.posterUrl || "", description: e.description as any, forcePast: e.forcePast });
               }} className="flex items-center gap-1 font-mono text-xs font-bold text-blue-600"><Edit2 size={14}/> EDITAR</button>
               <button onClick={() => {
                 if (confirm("Eliminar este evento?")) {
@@ -777,13 +825,23 @@ function BkidTab() {
   );
 }
 
-function ContentTab() {
+function ContentTab({ editLang }: { editLang: "pt" | "en" }) {
   const qc = useQueryClient();
   const { data: blocks = [] } = useListContentBlocks();
   const updateBlock = useUpdateContentBlock();
 
   const [editingKey, setEditingKey] = useState<string | null>(null);
-  const [form, setForm] = useState({ title: "", body: "", imageUrl: "" });
+  const [form, setForm] = useState({ title: { pt: "", en: "" } as any, body: { pt: "", en: "" } as any, imageUrl: "" });
+
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
+  };
 
   const handleSave = (key: string) => {
     updateBlock.mutate({ key, data: form }, {
@@ -809,8 +867,8 @@ function ContentTab() {
             
             {editingKey === block.key ? (
               <div className="space-y-4 mt-6">
-                <input value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-display text-2xl bg-background" placeholder="Título" />
-                <textarea value={form.body} onChange={e=>setForm({...form, body: e.target.value})} className="w-full border-2 border-border p-2 font-mono h-32 bg-background" placeholder="Conteúdo do corpo..." />
+                <input value={form.title?.[editLang] || ""} onChange={e=>handleLocalizedChange("title", e.target.value)} className="w-full border-2 border-border p-2 font-display text-2xl bg-background" placeholder="Título" />
+                <textarea value={form.body?.[editLang] || ""} onChange={e=>handleLocalizedChange("body", e.target.value)} className="w-full border-2 border-border p-2 font-mono h-32 bg-background" placeholder="Conteúdo do corpo..." />
                 <div className="flex gap-2">
                   <button onClick={() => handleSave(block.key)} className="bg-primary text-primary-foreground px-4 py-2 font-mono font-bold hover:bg-foreground"><Check size={18}/></button>
                   <button onClick={() => setEditingKey(null)} className="border-2 border-border px-4 py-2 hover:bg-muted"><X size={18}/></button>
@@ -818,10 +876,10 @@ function ContentTab() {
               </div>
             ) : (
               <div className="mt-4">
-                <h3 className="font-display text-2xl mb-2">{block.title || "[NO TITLE]"}</h3>
-                <p className="font-mono text-foreground/80 whitespace-pre-wrap mb-4 line-clamp-3">{block.body}</p>
+                <h3 className="font-display text-2xl mb-2">{(block.title as any)?.[editLang] || (block.title as any)?.pt || "[NO TITLE]"}</h3>
+                <p className="font-mono text-foreground/80 whitespace-pre-wrap mb-4 line-clamp-3">{(block.body as any)?.[editLang] || (block.body as any)?.pt}</p>
                 <button 
-                  onClick={() => { setEditingKey(block.key); setForm({ title: block.title||"", body: block.body||"", imageUrl: block.imageUrl||"" }); }}
+                  onClick={() => { setEditingKey(block.key); setForm({ title: block.title as any || { pt: "", en: "" }, body: block.body as any || { pt: "", en: "" }, imageUrl: block.imageUrl||"" }); }}
                   className="flex items-center gap-2 border-2 border-border px-4 py-2 font-mono text-sm hover:bg-muted"
                 >
                   <Edit2 size={14}/> EDITAR
@@ -1080,7 +1138,7 @@ function TracksTab() {
   );
 }
 
-function AnnouncementsTab() {
+function AnnouncementsTab({ editLang }: { editLang: "pt" | "en" }) {
   const { data: announcements = [] } = useAdminListAnnouncements();
   const create = useCreateAnnouncement();
   const update = useUpdateAnnouncement();
@@ -1088,9 +1146,18 @@ function AnnouncementsTab() {
 
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState<AnnouncementInput>({
-    title: "", content: "", imageUrl: "", isActive: true
-  });
+  const defaultForm = { title: { pt: "", en: "" } as any, content: { pt: "", en: "" } as any, imageUrl: "", isActive: true };
+  const [form, setForm] = useState<any>(defaultForm);
+
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
+  };
 
   const handleSave = () => {
     if (!form.title || !form.content) {
@@ -1103,7 +1170,7 @@ function AnnouncementsTab() {
         onSuccess: () => {
           toast.success("Anúncio atualizado!");
           setEditingId(null);
-          setForm({ title: "", content: "", imageUrl: "", isActive: true });
+          setForm(defaultForm);
         },
         onError: () => toast.error("Erro ao atualizar anúncio.")
       });
@@ -1112,14 +1179,14 @@ function AnnouncementsTab() {
         onSuccess: () => {
           toast.success("Anúncio criado!");
           setIsAdding(false);
-          setForm({ title: "", content: "", imageUrl: "", isActive: true });
+          setForm(defaultForm);
         },
         onError: () => toast.error("Erro ao criar anúncio.")
       });
     }
   };
 
-  const startEdit = (a: Announcement) => {
+  const startEdit = (a: any) => {
     setEditingId(a.id);
     setForm({ title: a.title, content: a.content, imageUrl: a.imageUrl || "", isActive: a.isActive });
   };
@@ -1129,7 +1196,7 @@ function AnnouncementsTab() {
       <div className="flex justify-between items-center">
         <h2 className="font-display text-3xl uppercase italic">Gestor de Anúncios</h2>
         <button 
-          onClick={() => { setIsAdding(true); setEditingId(null); setForm({ title: "", content: "", imageUrl: "", isActive: true }); }} 
+          onClick={() => { setIsAdding(true); setEditingId(null); setForm(defaultForm); }} 
           className="flex items-center gap-2 bg-primary text-black px-4 py-2 font-mono font-bold border-2 border-primary hover:bg-white hover:border-white transition-colors"
         >
           <Plus size={16} /> NOVO ANÚNCIO
@@ -1142,7 +1209,7 @@ function AnnouncementsTab() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="font-mono text-xs uppercase opacity-60">Título</label>
-              <input placeholder="ATUALIZAÇÃO DO SISTEMA" value={form.title} onChange={e=>setForm({...form, title: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none" />
+              <input placeholder="ATUALIZAÇÃO DO SISTEMA" value={form.title?.[editLang] || ""} onChange={e=>handleLocalizedChange("title", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none" />
             </div>
             <div className="space-y-1">
               <label className="font-mono text-xs uppercase opacity-60">URL de Imagem Personalizada (Bits)</label>
@@ -1150,7 +1217,7 @@ function AnnouncementsTab() {
             </div>
             <div className="space-y-1 md:col-span-2">
               <label className="font-mono text-xs uppercase opacity-60">Conteúdo da Mensagem</label>
-              <textarea placeholder="Introduz a mensagem aqui..." value={form.content} onChange={e=>setForm({...form, content: e.target.value})} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none h-24" />
+              <textarea placeholder="Introduz a mensagem aqui..." value={form.content?.[editLang] || ""} onChange={e=>handleLocalizedChange("content", e.target.value)} className="w-full border-2 border-border p-2 font-mono bg-background text-foreground focus:border-primary outline-none h-24" />
             </div>
             
             <label className="flex items-center gap-2 cursor-pointer group">
@@ -1177,8 +1244,8 @@ function AnnouncementsTab() {
                 )}
               </div>
               <div className="min-w-0">
-                <h4 className="font-display text-lg uppercase leading-tight italic">{a.title}</h4>
-                <p className="font-mono text-[10px] opacity-60 truncate max-w-full md:max-w-md">{a.content}</p>
+                <h4 className="font-display text-lg uppercase leading-tight italic">{(a.title as any)?.[editLang] || (a.title as any)?.pt}</h4>
+                <p className="font-mono text-[10px] opacity-60 truncate max-w-full md:max-w-md">{(a.content as any)?.[editLang] || (a.content as any)?.pt}</p>
               </div>
             </div>
             <div className="flex gap-2 flex-wrap md:flex-nowrap">
@@ -1288,32 +1355,34 @@ function AuditionsTab() {
   );
 }
 
-function VaultTab() {
+function VaultTab({ editLang }: { editLang: "pt" | "en" }) {
   const { data: assets = [] } = useAdminListVaultAssets();
   const create = useCreateVaultAsset();
   const update = useUpdateVaultAsset();
   const remove = useDeleteVaultAsset();
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState<VaultAssetInput>({
-    assetType: "setlist_pdf",
-    title: "",
-    description: "",
+  const emptyForm = {
+    assetType: "setlist_pdf" as any,
+    title: { pt: "", en: "" } as any,
+    description: { pt: "", en: "" } as any,
     fileUrl: "",
     previewUrl: "",
     isActive: true,
     sortOrder: 0,
-  });
+  };
+  const [form, setForm] = useState<any>(emptyForm);
 
-  const resetForm = () =>
-    setForm({
-      assetType: "setlist_pdf",
-      title: "",
-      description: "",
-      fileUrl: "",
-      previewUrl: "",
-      isActive: true,
-      sortOrder: 0,
-    });
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
+  };
+
+  const resetForm = () => setForm(emptyForm);
 
   const save = () => {
     if (!form.title || !form.fileUrl) {
@@ -1353,10 +1422,10 @@ function VaultTab() {
             <option value="backstage_photo">BACKSTAGE PHOTO</option>
             <option value="wallpaper">WALLPAPER</option>
           </select>
-          <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Título" className="border-2 border-border bg-background p-2 font-mono" />
+          <input value={form.title?.[editLang] || ""} onChange={(e) => handleLocalizedChange("title", e.target.value)} placeholder="Título" className="border-2 border-border bg-background p-2 font-mono" />
           <input value={form.fileUrl} onChange={(e) => setForm({ ...form, fileUrl: e.target.value })} placeholder="URL ficheiro" className="border-2 border-border bg-background p-2 font-mono md:col-span-2" />
           <input value={form.previewUrl || ""} onChange={(e) => setForm({ ...form, previewUrl: e.target.value })} placeholder="URL preview (opcional)" className="border-2 border-border bg-background p-2 font-mono md:col-span-2" />
-          <textarea value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Descrição" className="border-2 border-border bg-background p-2 font-mono md:col-span-2 h-20" />
+          <textarea value={form.description?.[editLang] || ""} onChange={(e) => handleLocalizedChange("description", e.target.value)} placeholder="Descrição" className="border-2 border-border bg-background p-2 font-mono md:col-span-2 h-20" />
           <input type="number" value={form.sortOrder || 0} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })} className="border-2 border-border bg-background p-2 font-mono" />
           <label className="flex items-center gap-2 font-mono text-sm">
             <input type="checkbox" checked={Boolean(form.isActive)} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} className="w-5 h-5 accent-primary" />
@@ -1380,7 +1449,7 @@ function VaultTab() {
           <div key={asset.id} className="border-4 border-border bg-card p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <p className="font-mono text-[10px] uppercase text-foreground/60">{asset.assetType} // ordem {asset.sortOrder}</p>
-              <h3 className="font-display text-xl uppercase">{asset.title}</h3>
+              <h3 className="font-display text-xl uppercase">{(asset.title as any)?.[editLang] || (asset.title as any)?.pt}</h3>
               <a href={asset.fileUrl} target="_blank" rel="noreferrer" className="font-mono text-xs text-primary underline break-all">{asset.fileUrl}</a>
             </div>
             <div className="flex gap-3">
@@ -1389,8 +1458,8 @@ function VaultTab() {
                   setEditingId(asset.id);
                   setForm({
                     assetType: asset.assetType,
-                    title: asset.title,
-                    description: asset.description || "",
+                    title: asset.title as any,
+                    description: asset.description as any || { pt: "", en: "" },
                     fileUrl: asset.fileUrl,
                     previewUrl: asset.previewUrl || "",
                     isActive: asset.isActive,
@@ -1422,14 +1491,24 @@ function VaultTab() {
   );
 }
 
-function PressKitTab() {
+function PressKitTab({ editLang }: { editLang: "pt" | "en" }) {
   const { data: pressKit } = useGetPressKit();
   const update = useUpdatePressKit();
-  const [form, setForm] = useState({
-    bioShort: "",
-    technicalRider: "",
+  const [form, setForm] = useState<any>({
+    bioShort: { pt: "", en: "" } as any,
+    technicalRider: { pt: "", en: "" } as any,
     photoUrls: [""],
   });
+
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
+  };
 
   useEffect(() => {
     if (!pressKit) return;
@@ -1446,16 +1525,16 @@ function PressKitTab() {
       <div className="border-4 border-border bg-card p-6 space-y-4">
         <div>
           <label className="block font-mono text-xs uppercase mb-1">Bio Curta</label>
-          <textarea value={form.bioShort} onChange={(e) => setForm({ ...form, bioShort: e.target.value })} className="w-full border-2 border-border bg-background p-2 font-mono h-24" />
+          <textarea value={form.bioShort?.[editLang] || ""} onChange={(e) => handleLocalizedChange("bioShort", e.target.value)} className="w-full border-2 border-border bg-background p-2 font-mono h-24" />
         </div>
         <div>
           <label className="block font-mono text-xs uppercase mb-1">Technical Rider</label>
-          <textarea value={form.technicalRider} onChange={(e) => setForm({ ...form, technicalRider: e.target.value })} className="w-full border-2 border-border bg-background p-2 font-mono h-48" />
+          <textarea value={form.technicalRider?.[editLang] || ""} onChange={(e) => handleLocalizedChange("technicalRider", e.target.value)} className="w-full border-2 border-border bg-background p-2 font-mono h-48" />
         </div>
         <div>
           <label className="block font-mono text-xs uppercase mb-2">Fotos (uma por campo)</label>
           <div className="space-y-2">
-            {form.photoUrls.map((url, index) => (
+            {form.photoUrls.map((url: string, index: number) => (
               <div key={`photo-${index}`} className="flex gap-2">
                 <input
                   value={url}
@@ -1476,7 +1555,7 @@ function PressKitTab() {
                     }
                     setForm({
                       ...form,
-                      photoUrls: form.photoUrls.filter((_, i) => i !== index),
+                      photoUrls: form.photoUrls.filter((_: unknown, i: number) => i !== index),
                     });
                   }}
                   className="px-3 border-2 border-border font-mono text-xs hover:bg-muted"
@@ -1500,7 +1579,7 @@ function PressKitTab() {
               {
                 bioShort: form.bioShort,
                 technicalRider: form.technicalRider,
-                photoUrls: form.photoUrls.map((line) => line.trim()).filter(Boolean),
+                photoUrls: form.photoUrls.map((line: string) => line.trim()).filter(Boolean),
               },
               {
                 onSuccess: () => toast.success("Press kit atualizado."),
@@ -1517,7 +1596,7 @@ function PressKitTab() {
   );
 }
 
-function TeamTab() {
+function TeamTab({ editLang }: { editLang: "pt" | "en" }) {
   const { data: members = [] } = useListTeamMembers();
   const createMember = useCreateTeamMember();
   const updateMember = useUpdateTeamMember();
@@ -1525,10 +1604,10 @@ function TeamTab() {
 
   const emptyForm = {
     name: "",
-    role: "",
+    role: { pt: "", en: "" } as any,
     codename: "",
     age: 17,
-    bio: "",
+    bio: { pt: "", en: "" } as any,
     photoUrl: "",
     sortOrder: 0,
   };
@@ -1552,6 +1631,16 @@ function TeamTab() {
     setForm(emptyForm);
     setSourceMode("url");
     setSelectedFileName("");
+  };
+
+  const handleLocalizedChange = (name: string, value: string) => {
+    setForm((f: any) => ({
+      ...f,
+      [name]: {
+        ...(f[name] || { pt: "", en: "" }),
+        [editLang]: value
+      }
+    }));
   };
 
   const clampCropPan = (nextPan: { x: number; y: number }) => {
@@ -1678,10 +1767,10 @@ function TeamTab() {
     setEditingId(member.id);
     setForm({
       name: member.name,
-      role: member.role,
+      role: member.role as any,
       codename: member.codename,
       age: member.age,
-      bio: member.bio || "",
+      bio: member.bio as any || { pt: "", en: "" },
       photoUrl: member.photoUrl || "",
       sortOrder: member.sortOrder,
     });
@@ -1767,8 +1856,8 @@ function TeamTab() {
             <label className="block font-mono text-xs uppercase mb-1">Função</label>
             <input
               required
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              value={form.role?.[editLang] || ""}
+              onChange={(e) => handleLocalizedChange("role", e.target.value)}
               className="w-full border-2 border-border bg-background p-2 font-mono"
               placeholder="Programador"
             />
@@ -1841,8 +1930,8 @@ function TeamTab() {
         <div>
           <label className="block font-mono text-xs uppercase mb-1">Bio curta</label>
           <textarea
-            value={form.bio}
-            onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            value={form.bio?.[editLang] || ""}
+            onChange={(e) => handleLocalizedChange("bio", e.target.value)}
             className="w-full border-2 border-border bg-background p-2 font-mono h-24"
             placeholder="Descrição criativa do membro"
           />
@@ -1992,7 +2081,7 @@ function TeamTab() {
               </div>
               <div className="font-mono text-xs border-2 border-border px-2 py-1">#{member.sortOrder}</div>
             </div>
-            <p className="font-mono text-sm uppercase text-foreground/70">{member.role} / {member.age} anos</p>
+            <p className="font-mono text-sm uppercase text-foreground/70">{(member.role as any)?.[editLang] || (member.role as any)?.pt} / {member.age} anos</p>
             {member.photoUrl ? (
               <img src={member.photoUrl} alt={member.name} className="w-full h-56 object-cover border-2 border-border" />
             ) : (
@@ -2000,7 +2089,7 @@ function TeamTab() {
                 Sem fotografia
               </div>
             )}
-            <p className="font-mono text-xs leading-relaxed text-foreground/75">{member.bio || "Sem bio configurada."}</p>
+            <p className="font-mono text-xs leading-relaxed text-foreground/75">{(member.bio as any)?.[editLang] || (member.bio as any)?.pt || "Sem bio configurada."}</p>
             <div className="flex gap-2 pt-1">
               <button
                 type="button"

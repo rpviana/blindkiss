@@ -9,37 +9,42 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface LocalizedText {
+  pt: string;
+  en: string;
+}
+
 export interface OkResponse {
   ok: boolean;
 }
 
 export interface Event {
   id: number;
-  title: string;
-  venue: string;
-  city: string;
+  title: LocalizedText;
+  venue: LocalizedText;
+  city: LocalizedText;
   address: string;
   mapsUrl?: string | null;
   ticketUrl?: string | null;
   price?: string | null;
   eventDate: string;
   posterUrl?: string | null;
-  description?: string | null;
+  description?: LocalizedText | null;
   forcePast: boolean;
   isPast: boolean;
 }
 
 export interface EventInput {
-  title: string;
-  venue: string;
-  city: string;
+  title: LocalizedText;
+  venue: LocalizedText;
+  city: LocalizedText;
   address: string;
   mapsUrl?: string | null;
   ticketUrl?: string | null;
   price?: string | null;
   eventDate: string;
   posterUrl?: string | null;
-  description?: string | null;
+  description?: LocalizedText | null;
   forcePast?: boolean;
 }
 
@@ -70,39 +75,39 @@ export interface SiteSettings {
   colorText: string;
   colorAccent: string;
   glitchMode: boolean;
-  recruitmentTitle: string;
-  recruitmentSubtitle: string;
-  recruitmentBassist: string;
-  recruitmentDrummer: string;
+  recruitmentTitle: LocalizedText;
+  recruitmentSubtitle: LocalizedText;
+  recruitmentBassist: LocalizedText;
+  recruitmentDrummer: LocalizedText;
   recruitmentContact: string;
-  heroTagline: string;
+  heroTagline: LocalizedText;
   footerCoords: string;
   footerCity: string;
   showRecruitment: boolean;
   showRecruitmentBassist: boolean;
   showRecruitmentDrummer: boolean;
-  recruitmentUrgentText: string;
+  recruitmentUrgentText: LocalizedText;
   showRecruitmentUrgent: boolean;
-  marqueeText: string;
+  marqueeText: LocalizedText;
   logoUrl?: string | null;
   homeLogoUrl?: string | null;
-  archiveTitle: string;
-  archiveSubtitle: string;
-  archiveUpcomingButton: string;
-  archivePastButton: string;
+  archiveTitle: LocalizedText;
+  archiveSubtitle: LocalizedText;
+  archiveUpcomingButton: LocalizedText;
+  archivePastButton: LocalizedText;
 }
 
 export interface ContentBlock {
   id: number;
   key: string;
-  title?: string | null;
-  body?: string | null;
+  title?: LocalizedText | null;
+  body?: LocalizedText | null;
   imageUrl?: string | null;
 }
 
 export interface ContentBlockInput {
-  title?: string | null;
-  body?: string | null;
+  title?: LocalizedText | null;
+  body?: LocalizedText | null;
   imageUrl?: string | null;
 }
 

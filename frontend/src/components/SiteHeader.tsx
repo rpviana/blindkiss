@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Globe } from "lucide-react";
 import { useGetSiteSettings } from "@/api-client";
+import { useLanguage } from "@/lib/i18n";
 import logoUrl from "@assets/logo.png";
 import logoTextUrl from "@assets/logo-text.png";
 
@@ -11,11 +12,13 @@ export function SiteHeader() {
   const { data: settings } = useGetSiteSettings();
   const headerLogoSrc = settings?.logoUrl || logoUrl;
 
+  const { language, setLanguage } = useLanguage();
+
   const mainLinks = [
-    { href: "/", label: "INÍCIO" },
-    { href: "/archive", label: "ARQUIVO" },
+    { href: "/", label: language === "pt" ? "INÍCIO" : "HOME" },
+    { href: "/archive", label: language === "pt" ? "ARQUIVO" : "ARCHIVE" },
     { href: "/bk-id", label: "BK-ID" },
-    { href: "/team", label: "EQUIPA" },
+    { href: "/team", label: language === "pt" ? "EQUIPA" : "TEAM" },
   ];
 
   return (
@@ -39,6 +42,14 @@ export function SiteHeader() {
               [{link.label}]
             </Link>
           ))}
+          <button
+            onClick={() => setLanguage(language === "pt" ? "en" : "pt")}
+            className="flex items-center gap-1 text-sm font-mono text-foreground hover:text-primary transition-colors ml-4 uppercase"
+            title="Mudar Idioma / Change Language"
+          >
+            <Globe size={16} />
+            {language}
+          </button>
         </nav>
 
         {/* Mobile Toggle */}
@@ -66,6 +77,16 @@ export function SiteHeader() {
                 [{link.label}]
               </Link>
             ))}
+            <button
+              onClick={() => {
+                setLanguage(language === "pt" ? "en" : "pt");
+                setIsOpen(false);
+              }}
+              className="flex items-center gap-2 text-lg font-mono text-foreground hover:text-primary transition-colors uppercase mt-4"
+            >
+              <Globe size={20} />
+              {language === "pt" ? "ENGLISH" : "PORTUGUÊS"}
+            </button>
           </nav>
         </div>
       )}
